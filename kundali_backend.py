@@ -1,11 +1,12 @@
 ﻿from flask import Flask, request, jsonify
+from flask_cors import CORS  # Added CORS import
 import swisseph as swe
 from datetime import datetime, timedelta, timezone
 from geopy.geocoders import Nominatim
 
 swe.set_sid_mode(swe.SIDM_LAHIRI)
 app = Flask(__name__)
-CORS(app, resources={r"/kundali": {"origins": "https://astrologerinranchi.com", "methods": ["POST", "OPTIONS"], "allow_headers": ["Content-Type"]}})
+CORS(app, resources={r"/kundali": {"origins": "https://astrologerinranchi.com", "methods": ["POST", "OPTIONS"], "allow_headers": ["Content-Type", "Accept"]}})
 
 def get_lat_lon(birth_place):
     try:
@@ -92,8 +93,8 @@ def compute_lagna(birth_jd, lat, lon, ayanamsa):
     print(f"Debug: Lagna Degree = {ascendant_degree_corrected}°")
     print(f"Debug: Lagna Rashi = {lagna_rashi}")
     return ascendant_degree_corrected, lagna_rashi
-    
-    # Define nakshatra_letters globally
+
+# Define nakshatra_letters globally
 nakshatra_letters = {
     "अश्विनी": ["च", "चि", "चु", "चे"],
     "भरणी": ["ल", "लि", "लू", "ले"],
@@ -123,7 +124,6 @@ nakshatra_letters = {
     "उत्तराभाद्रपद": ["ख", "खि", "खू", "खे"],
     "रेवती": ["ल", "लि", "लू", "ले"]
 }
-# ... (other functions like get_lat_lon, convert_to_julian, etc., remain unchanged)
 
 nakshatras = [
     "अश्विनी", "भरणी", "कृत्तिका", "रोहिणी", "मृगशीर्ष", "आर्द्रा", "पुनर्वसु", "पुष्य", "आश्लेषा",
@@ -176,7 +176,7 @@ mahadasha_periods = {
     "बुध": 17
 }
 
-# Rashi to Lord mapping (moved from compute_planet_positions)
+# Rashi to Lord mapping
 rashi_lord = {
     "मेष": "मंगल",
     "वृष": "शुक्र",
@@ -366,7 +366,7 @@ def compute_planet_positions(birth_jd, ayanamsa):
             "sign_number": sign_index + 1,
             "rashi": sign,
             "rashi_number": sign_index + 1,
-            "rashi_lord": rashi_lord[sign],  # Corrected to fetch the lord for the specific rashi
+            "rashi_lord": rashi_lord[sign],
             "nakshatra": nakshatra,
             "charan": charan,
             "naming_letter": naming_letter if naming_letter else None,
@@ -398,7 +398,7 @@ def build_north_indian_chart(lagna_sign_index, moon_sign_index, planet_positions
         chandra_chart[chandra_house]["planets"].append(planet)
     
     return lagna_chart, chandra_chart
-    
+
 @app.route('/kundali', methods=['POST', 'OPTIONS'])
 def calculate_kundali():
     if request.method == 'OPTIONS':
@@ -476,21 +476,6 @@ def calculate_kundali():
     # 2. Calculate Ishta Devta (Ruler of 12th house from Lagna)
     twelfth_house_number = (lagna_sign_index + 11) % 12 + 1  # 12th house from Lagna (1-based)
     twelfth_house_sign = lagna_chart[twelfth_house_number]["sign"]
-    # Use the global rashi_lord dictionary defined in compute_planet_positions
-    rashi_lord = {
-        "मेष": "मंगल",
-        "वृष": "शुक्र",
-        "मिथुन": "बुध",
-        "कर्क": "चंद्र",
-        "सिंह": "सूर्य",
-        "कन्या": "बुध",
-        "तुला": "शुक्र",
-        "वृश्चिक": "मंगल",
-        "धनु": "बृहस्पति",
-        "मकर": "शनि",
-        "कुंभ": "शनि",
-        "मीन": "बृहस्पति"
-    }
     twelfth_house_rashi_lord = rashi_lord.get(twelfth_house_sign, "Unknown")
     ishta_devta = rashi_ishta_devta.get(twelfth_house_sign, "Unknown")
 
@@ -501,14 +486,14 @@ def calculate_kundali():
         lucky_number = sum(int(digit) for digit in str(lucky_number))
 
     # 4. Calculate Lucky Color
-    rashi_lord_for_color = planet_positions["चंद्र"]["rashi_lord"]  # Already a string
+    rashi_lord_for_color = planet_positions["चंद्र"]["rashi_lord"]
     lucky_color = planet_lucky_colors.get(rashi_lord_for_color, "Unknown")
 
     # 5. Calculate Lucky Date
-    birth_day = int(birth_date.split('-')[2])  # Extract day from YYYY-MM-DD
+    birth_day = int(birth_date.split('-')[2])
     rashi_number = rashi_numbers.get(rashi, 0)
     lucky_date = birth_day + rashi_number
-    if lucky_date > 31:  # Adjust if exceeds month length (simplified)
+    if lucky_date > 31:
         lucky_date = lucky_date % 31 or 31
 
     # 6. Calculate Gemstones based on Lagna Chart
@@ -517,75 +502,65 @@ def calculate_kundali():
     bhagyavardhak = bhagyavardhak_ratna.get(first_house_sign, "Unknown")
 
     # विद्या वर्धक रत्न (5th house)
-    fifth_house_number = (lagna_sign_index + 4) % 12 + 1  # 5th house from Lagna (1-based)
+    fifth_house_number = (lagna_sign_index + 4) % 12 + 1
     fifth_house_sign = lagna_chart[fifth_house_number]["sign"]
     vidya_vardhak = vidya_vardhak_ratna.get(fifth_house_sign, "Unknown")
 
     # जीवन रक्षक रत्न (9th house)
-    ninth_house_number = (lagna_sign_index + 8) % 12 + 1  # 9th house from Lagna (1-based)
+    ninth_house_number = (lagna_sign_index + 8) % 12 + 1
     ninth_house_sign = lagna_chart[ninth_house_number]["sign"]
     jeevan_rakshak = jeevan_rakshak_ratna.get(ninth_house_sign, "Unknown")
     
     # Mangal Dosha Calculation
-    mangal_dosha_houses = [1, 4, 7, 8, 12]  # Houses where Mars causes Mangal Dosha
-    kendra_houses = [1, 4, 7, 10]           # Kendra houses for Moon check
+    mangal_dosha_houses = [1, 4, 7, 8, 12]
+    kendra_houses = [1, 4, 7, 10]
 
-    # Find Mars' house
     mars_house = None
     for house in range(1, 13):
         if "मंगल" in lagna_chart[house]["planets"]:
             mars_house = house
             break
 
-    # Check if Mangal Dosha exists
     mangal_dosha = mars_house in mangal_dosha_houses if mars_house else False
 
-    # If Mangal Dosha exists, check conditions to nullify it
     mangal_dosha_details = {"exists": mangal_dosha, "nullified": False, "reasons": []}
     if mangal_dosha:
-        # Find Jupiter's house
         jupiter_house = None
         for house in range(1, 13):
             if "बृहस्पति" in lagna_chart[house]["planets"]:
                 jupiter_house = house
                 break
 
-        # Find Moon's house
         moon_house = None
         for house in range(1, 13):
             if "चंद्र" in lagna_chart[house]["planets"]:
                 moon_house = house
                 break
 
-        # Find Rahu's house
         rahu_house = None
         for house in range(1, 13):
             if "राहु" in lagna_chart[house]["planets"]:
                 rahu_house = house
                 break
 
-        # Condition 1: Jupiter aspects Mars
         if jupiter_house:
             jupiter_aspects = [
-                (jupiter_house + 4) % 12 or 12,  # 5th house aspect
-                (jupiter_house + 6) % 12 or 12,  # 7th house aspect
-                (jupiter_house + 8) % 12 or 12   # 9th house aspect
+                (jupiter_house + 4) % 12 or 12,
+                (jupiter_house + 6) % 12 or 12,
+                (jupiter_house + 8) % 12 or 12
             ]
             if mars_house in jupiter_aspects:
                 mangal_dosha_details["nullified"] = True
                 mangal_dosha_details["reasons"].append("गुरु मंगल को देख रहा है")
 
-        # Condition 2: Moon in Kendra
         if moon_house in kendra_houses:
             mangal_dosha_details["nullified"] = True
             mangal_dosha_details["reasons"].append("चंद्रमा केंद्र में है")
 
-        # Condition 3: Moon conjunct with Mars
         if moon_house == mars_house:
             mangal_dosha_details["nullified"] = True
             mangal_dosha_details["reasons"].append("चंद्रमा मंगल के साथ है")
 
-        # Condition 4: Rahu conjunct with Mars
         if rahu_house == mars_house:
             mangal_dosha_details["nullified"] = True
             mangal_dosha_details["reasons"].append("राहु मंगल के साथ है")
@@ -606,241 +581,234 @@ def calculate_kundali():
     kaalsarp_dosha = False
     kaalsarp_details = {"exists": False, "rahu_house": rahu_house, "ketu_house": ketu_house}
     if rahu_house and ketu_house:
-        # Normalize houses for circular check (Rahu < Ketu or Ketu < Rahu)
         min_house = min(rahu_house, ketu_house)
         max_house = max(rahu_house, ketu_house)
         
-        # Check if all planets are between Rahu and Ketu (one side of the axis)
         all_between = True
         for planet, house in planet_houses.items():
-            # Planets should either be between min_house and max_house (clockwise)
-            # or outside max_house to min_house (counterclockwise)
             if not ((min_house < house < max_house) or (house < min_house or house > max_house)):
                 all_between = False
                 break
         
-        # If all planets are on one side, check which side
         if all_between:
             kaalsarp_dosha = True
         else:
-            # Check the other side (counterclockwise)
             all_between_reverse = all((house < min_house or house > max_house) for house in planet_houses.values())
             kaalsarp_dosha = all_between_reverse
 
-        kaalsarp_details["exists"] = kaalsarp_dosha        
+        kaalsarp_details["exists"] = kaalsarp_dosha
 
-        # Prediction Analysis
-        def get_planet_house(planet, lagna_chart):
-            for house in range(1, 13):
-                if planet in lagna_chart[house]["planets"]:
-                    return house
-            return None
+    # Prediction Analysis
+    def get_planet_house(planet, lagna_chart):
+        for house in range(1, 13):
+            if planet in lagna_chart[house]["planets"]:
+                return house
+        return None
 
-        # 1. Study (5th House Analysis)
-        fifth_house_number = (lagna_sign_index + 4) % 12 + 1  # 5th house
-        fifth_house_sign = lagna_chart[fifth_house_number]["sign"]
-        fifth_house_lord = rashi_lord[fifth_house_sign]
-        fifth_lord_house = get_planet_house(fifth_house_lord, lagna_chart)
+    # 1. Study (5th House Analysis)
+    fifth_house_number = (lagna_sign_index + 4) % 12 + 1
+    fifth_house_sign = lagna_chart[fifth_house_number]["sign"]
+    fifth_house_lord = rashi_lord[fifth_house_sign]
+    fifth_lord_house = get_planet_house(fifth_house_lord, lagna_chart)
 
-        study_problem = False
-        study_problem_reasons = []
-        if fifth_lord_house is not None and fifth_lord_house in dusthana_houses:
-            study_problem = True
-            study_problem_reasons.append(f"पांचवे घर का स्वामी {fifth_house_lord} दुष्टान घर {fifth_lord_house} में है")
-        if any(planet in lagna_chart[fifth_house_number]["planets"] for planet in malefics):
-            study_problem = True
-            malefic_planets = [planet for planet in lagna_chart[fifth_house_number]["planets"] if planet in malefics]
-            study_problem_reasons.append(f"पांचवे घर में पाप ग्रह {', '.join(malefic_planets)} हैं")
+    study_problem = False
+    study_problem_reasons = []
+    if fifth_lord_house is not None and fifth_lord_house in dusthana_houses:
+        study_problem = True
+        study_problem_reasons.append(f"पांचवे घर का स्वामी {fifth_house_lord} दुष्टान घर {fifth_lord_house} में है")
+    if any(planet in lagna_chart[fifth_house_number]["planets"] for planet in malefics):
+        study_problem = True
+        malefic_planets = [planet for planet in lagna_chart[fifth_house_number]["planets"] if planet in malefics]
+        study_problem_reasons.append(f"पांचवे घर में पाप ग्रह {', '.join(malefic_planets)} हैं")
 
-        if study_problem:
-            study_statement = f"पढ़ाई में समस्याएं आ सकती हैं क्योंकि {', '.join(study_problem_reasons)}।"
-            study_resolution = "समस्या का समाधान 1-3 साल में हो सकता है।"
-        else:
-            study_statement = "पढ़ाई में कोई बड़ी समस्या नहीं है।"
-            study_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
+    if study_problem:
+        study_statement = f"पढ़ाई में समस्याएं आ सकती हैं क्योंकि {', '.join(study_problem_reasons)}।"
+        study_resolution = "समस्या का समाधान 1-3 साल में हो सकता है।"
+    else:
+        study_statement = "पढ़ाई में कोई बड़ी समस्या नहीं है।"
+        study_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
 
-        study_response = {
-            "statement": study_statement,
-            "resolution": study_resolution
-}
+    study_response = {
+        "statement": study_statement,
+        "resolution": study_resolution
+    }
 
-        # 2. Money (2nd and 11th Houses Analysis)
-        second_house_number = (lagna_sign_index + 1) % 12 + 1  # 2nd house
-        second_house_sign = lagna_chart[second_house_number]["sign"]
-        second_house_lord = rashi_lord[second_house_sign]
-        second_lord_house = get_planet_house(second_house_lord, lagna_chart)
+    # 2. Money (2nd and 11th Houses Analysis)
+    second_house_number = (lagna_sign_index + 1) % 12 + 1
+    second_house_sign = lagna_chart[second_house_number]["sign"]
+    second_house_lord = rashi_lord[second_house_sign]
+    second_lord_house = get_planet_house(second_house_lord, lagna_chart)
 
-        eleventh_house_number = (lagna_sign_index + 10) % 12 + 1  # 11th house
-        eleventh_house_sign = lagna_chart[eleventh_house_number]["sign"]
-        eleventh_house_lord = rashi_lord[eleventh_house_sign]
-        eleventh_lord_house = get_planet_house(eleventh_house_lord, lagna_chart)
+    eleventh_house_number = (lagna_sign_index + 10) % 12 + 1
+    eleventh_house_sign = lagna_chart[eleventh_house_number]["sign"]
+    eleventh_house_lord = rashi_lord[eleventh_house_sign]
+    eleventh_lord_house = get_planet_house(eleventh_house_lord, lagna_chart)
 
-        money_problem = False
-        money_problem_reasons = []
-        if second_lord_house is not None and second_lord_house in dusthana_houses:
-            money_problem = True
-            money_problem_reasons.append(f"दूसरे घर का स्वामी {second_house_lord} दुष्टान घर {second_lord_house} में है")
-        if eleventh_lord_house is not None and eleventh_lord_house in dusthana_houses:
-            money_problem = True
-            money_problem_reasons.append(f"ग्यारहवें घर का स्वामी {eleventh_house_lord} दुष्टान घर {eleventh_lord_house} में है")
-        if any(planet in lagna_chart[second_house_number]["planets"] for planet in malefics):
-            money_problem = True
-            malefic_planets = [planet for planet in lagna_chart[second_house_number]["planets"] if planet in malefics]
-            money_problem_reasons.append(f"दूसरे घर में पाप ग्रह {', '.join(malefic_planets)} हैं")
-        if any(planet in lagna_chart[eleventh_house_number]["planets"] for planet in malefics):
-            money_problem = True
-            malefic_planets = [planet for planet in lagna_chart[eleventh_house_number]["planets"] if planet in malefics]
-            money_problem_reasons.append(f"ग्यारहवें घर में पाप ग्रह {', '.join(malefic_planets)} हैं")
+    money_problem = False
+    money_problem_reasons = []
+    if second_lord_house is not None and second_lord_house in dusthana_houses:
+        money_problem = True
+        money_problem_reasons.append(f"दूसरे घर का स्वामी {second_house_lord} दुष्टान घर {second_lord_house} में है")
+    if eleventh_lord_house is not None and eleventh_lord_house in dusthana_houses:
+        money_problem = True
+        money_problem_reasons.append(f"ग्यारहवें घर का स्वामी {eleventh_house_lord} दुष्टान घर {eleventh_lord_house} में है")
+    if any(planet in lagna_chart[second_house_number]["planets"] for planet in malefics):
+        money_problem = True
+        malefic_planets = [planet for planet in lagna_chart[second_house_number]["planets"] if planet in malefics]
+        money_problem_reasons.append(f"दूसरे घर में पाप ग्रह {', '.join(malefic_planets)} हैं")
+    if any(planet in lagna_chart[eleventh_house_number]["planets"] for planet in malefics):
+        money_problem = True
+        malefic_planets = [planet for planet in lagna_chart[eleventh_house_number]["planets"] if planet in malefics]
+        money_problem_reasons.append(f"ग्यारहवें घर में पाप ग्रह {', '.join(malefic_planets)} हैं")
 
-        if money_problem:
-            money_statement = f"धन संबंधी समस्याएं आ सकती हैं क्योंकि {', '.join(money_problem_reasons)}।"
-            money_resolution = "समस्या का समाधान 1-2 साल में हो सकता है।"
-        else:
-            money_statement = "धन संबंधी कोई बड़ी समस्या नहीं है।"
-            money_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
+    if money_problem:
+        money_statement = f"धन संबंधी समस्याएं आ सकती हैं क्योंकि {', '.join(money_problem_reasons)}।"
+        money_resolution = "समस्या का समाधान 1-2 साल में हो सकता है।"
+    else:
+        money_statement = "धन संबंधी कोई बड़ी समस्या नहीं है।"
+        money_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
 
-        money_response = {
-            "statement": money_statement,
-            "resolution": money_resolution
-}
+    money_response = {
+        "statement": money_statement,
+        "resolution": money_resolution
+    }
 
-        # 3. Work/Business (10th House Analysis)
-        tenth_house_number = (lagna_sign_index + 9) % 12 + 1  # 10th house
-        tenth_house_sign = lagna_chart[tenth_house_number]["sign"]
-        tenth_house_lord = rashi_lord[tenth_house_sign]
-        tenth_lord_house = get_planet_house(tenth_house_lord, lagna_chart)
+    # 3. Work/Business (10th House Analysis)
+    tenth_house_number = (lagna_sign_index + 9) % 12 + 1
+    tenth_house_sign = lagna_chart[tenth_house_number]["sign"]
+    tenth_house_lord = rashi_lord[tenth_house_sign]
+    tenth_lord_house = get_planet_house(tenth_house_lord, lagna_chart)
 
-        work_problem = False
-        work_problem_reasons = []
-        if tenth_lord_house is not None and tenth_lord_house in dusthana_houses:
-            work_problem = True
-            work_problem_reasons.append(f"दसवें घर का स्वामी {tenth_house_lord} दुष्टान घर {tenth_lord_house} में है")
-        if any(planet in lagna_chart[tenth_house_number]["planets"] for planet in malefics):
-            work_problem = True
-            malefic_planets = [planet for planet in lagna_chart[tenth_house_number]["planets"] if planet in malefics]
-            work_problem_reasons.append(f"दसवें घर में पाप ग्रह {', '.join(malefic_planets)} हैं")
+    work_problem = False
+    work_problem_reasons = []
+    if tenth_lord_house is not None and tenth_lord_house in dusthana_houses:
+        work_problem = True
+        work_problem_reasons.append(f"दसवें घर का स्वामी {tenth_house_lord} दुष्टान घर {tenth_lord_house} में है")
+    if any(planet in lagna_chart[tenth_house_number]["planets"] for planet in malefics):
+        work_problem = True
+        malefic_planets = [planet for planet in lagna_chart[tenth_house_number]["planets"] if planet in malefics]
+        work_problem_reasons.append(f"दसवें घर में पाप ग्रह {', '.join(malefic_planets)} हैं")
 
-        if work_problem:
-            work_statement = f"कार्यक्षेत्र में चुनौतियाँ आ सकती हैं क्योंकि {', '.join(work_problem_reasons)}।"
-            work_resolution = "समस्या का समाधान 1-3 साल में हो सकता है।"
-        else:
-            work_statement = "कार्यक्षेत्र में कोई बड़ी समस्या नहीं है।"
-            work_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
+    if work_problem:
+        work_statement = f"कार्यक्षेत्र में चुनौतियाँ आ सकती हैं क्योंकि {', '.join(work_problem_reasons)}।"
+        work_resolution = "समस्या का समाधान 1-3 साल में हो सकता है।"
+    else:
+        work_statement = "कार्यक्षेत्र में कोई बड़ी समस्या नहीं है।"
+        work_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
 
-        work_response = {
-            "statement": work_statement,
-            "resolution": work_resolution
-}
+    work_response = {
+        "statement": work_statement,
+        "resolution": work_resolution
+    }
 
-        # 4. Marriage (7th House Analysis)
-        seventh_house_number = (lagna_sign_index + 6) % 12 + 1  # 7th house
-        seventh_house_sign = lagna_chart[seventh_house_number]["sign"]
-        seventh_house_lord = rashi_lord[seventh_house_sign]
-        seventh_lord_house = get_planet_house(seventh_house_lord, lagna_chart)
+    # 4. Marriage (7th House Analysis)
+    seventh_house_number = (lagna_sign_index + 6) % 12 + 1
+    seventh_house_sign = lagna_chart[seventh_house_number]["sign"]
+    seventh_house_lord = rashi_lord[seventh_house_sign]
+    seventh_lord_house = get_planet_house(seventh_house_lord, lagna_chart)
 
-        marriage_problem = False
-        marriage_problem_reasons = []
-        if seventh_lord_house is not None and seventh_lord_house in dusthana_houses:
-            marriage_problem = True
-            marriage_problem_reasons.append(f"सातवें घर का स्वामी {seventh_house_lord} दुष्टान घर {seventh_lord_house} में है")
-        if any(planet in lagna_chart[seventh_house_number]["planets"] for planet in malefics):
-            marriage_problem = True
-            malefic_planets = [planet for planet in lagna_chart[seventh_house_number]["planets"] if planet in malefics]
-            marriage_problem_reasons.append(f"सातवें घर में पाप ग्रह {', '.join(malefic_planets)} हैं")
+    marriage_problem = False
+    marriage_problem_reasons = []
+    if seventh_lord_house is not None and seventh_lord_house in dusthana_houses:
+        marriage_problem = True
+        marriage_problem_reasons.append(f"सातवें घर का स्वामी {seventh_house_lord} दुष्टान घर {seventh_lord_house} में है")
+    if any(planet in lagna_chart[seventh_house_number]["planets"] for planet in malefics):
+        marriage_problem = True
+        malefic_planets = [planet for planet in lagna_chart[seventh_house_number]["planets"] if planet in malefics]
+        marriage_problem_reasons.append(f"सातवें घर में पाप ग्रह {', '.join(malefic_planets)} हैं")
 
-        if marriage_problem:
-            marriage_statement = f"विवाह में समस्याएं आ सकती हैं क्योंकि {', '.join(marriage_problem_reasons)}।"
-            marriage_resolution = "समस्या का समाधान 1-2 साल में हो सकता है।"
-        else:
-            marriage_statement = "विवाह में कोई बड़ी समस्या नहीं है।"
-            marriage_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
+    if marriage_problem:
+        marriage_statement = f"विवाह में समस्याएं आ सकती हैं क्योंकि {', '.join(marriage_problem_reasons)}।"
+        marriage_resolution = "समस्या का समाधान 1-2 साल में हो सकता है।"
+    else:
+        marriage_statement = "विवाह में कोई बड़ी समस्या नहीं है।"
+        marriage_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
 
-        marriage_response = {
-            "statement": marriage_statement,
-            "resolution": marriage_resolution
-}
+    marriage_response = {
+        "statement": marriage_statement,
+        "resolution": marriage_resolution
+    }
 
-        # 5. Mahadasha/Sade Sati Analysis
-        mahadasha_problem = ruling_planet in malefics  # If current Mahadasha planet is malefic
-        moon_house = get_planet_house("चंद्र", lagna_chart)
-        saturn_house = get_planet_house("शनि", lagna_chart)
-        sade_sati = False
-        if moon_house and saturn_house:
-            relative_position = (saturn_house - moon_house) % 12
-        if relative_position in [0, 1, 11]:  # Saturn in 12th, 1st, or 2nd from Moon
+    # 5. Mahadasha/Sade Sati Analysis
+    mahadasha_problem = ruling_planet in malefics
+    moon_house = get_planet_house("चंद्र", lagna_chart)
+    saturn_house = get_planet_house("शनि", lagna_chart)
+    sade_sati = False
+    if moon_house and saturn_house:
+        relative_position = (saturn_house - moon_house) % 12
+        if relative_position in [0, 1, 11]:
             sade_sati = True
 
-        if mahadasha_problem:
-            mahadasha_statement = f"महादशा के कारण समस्याएं आ सकती हैं क्योंकि वर्तमान महादशा ग्रह {ruling_planet} एक पाप ग्रह है।"
-            mahadasha_resolution = "समस्या का समाधान अगली महादशा तक हो सकता है।"
-        else:
-            mahadasha_statement = "महादशा के कारण कोई बड़ी समस्या नहीं है।"
-            mahadasha_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
+    if mahadasha_problem:
+        mahadasha_statement = f"महादशा के कारण समस्याएं आ सकती हैं क्योंकि वर्तमान महादशा ग्रह {ruling_planet} एक पाप ग्रह है।"
+        mahadasha_resolution = "समस्या का समाधान अगली महादशा तक हो सकता है।"
+    else:
+        mahadasha_statement = "महादशा के कारण कोई बड़ी समस्या नहीं है।"
+        mahadasha_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
 
-        if sade_sati:
-            sade_sati_statement = "साढ़ेसाती के कारण जीवन में कठिनाइयाँ आ सकती हैं क्योंकि शनि चंद्र से निकट स्थिति में है।"
-            sade_sati_resolution = "समस्या का समाधान 7.5 साल तक हो सकता है।"
-        else:
-            sade_sati_statement = "साढ़ेसाती के कारण कोई बड़ी समस्या नहीं है।"
-            sade_sati_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
+    if sade_sati:
+        sade_sati_statement = "साढ़ेसाती के कारण जीवन में कठिनाइयाँ आ सकती हैं क्योंकि शनि चंद्र से निकट स्थिति में है।"
+        sade_sati_resolution = "समस्या का समाधान 7.5 साल तक हो सकता है।"
+    else:
+        sade_sati_statement = "साढ़ेसाती के कारण कोई बड़ी समस्या नहीं है।"
+        sade_sati_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
 
-        mahadasha_sadesati_response = {
-            "mahadasha_problem": {
+    mahadasha_sadesati_response = {
+        "mahadasha_problem": {
             "statement": mahadasha_statement,
             "resolution": mahadasha_resolution
-    },
+        },
         "sade_sati_problem": {
             "statement": sade_sati_statement,
             "resolution": sade_sati_resolution
-    }
-}
-
-    return jsonify({
-            "name": name,
-            "birth_date": birth_date,
-            "birth_time": birth_time,
-            "birth_place": birth_place,
-            "latitude": lat,
-            "longitude": lon,
-            "birth_julian_day": birth_jd,
-            "ayanamsa_lahiri": ayanamsa - 0.88,
-            "sunrise_julian_day": sunrise_jd,
-            "sunrise_time": converted_sunrise_time,
-            "ist_kaal": ist_kaal,
-            "lagna_degree": lagna_degree,
-            "lagna_rashi": lagna_rashi,
-            "janam_nakshatra": janam_nakshatra,
-            "janam_charan": janam_charan,
-            "rashi": rashi,
-            "rashi_naam_start_from": planet_positions["चंद्र"]["naming_letter"],
-            "gana": janam_gana,
-            "lagna_chart": lagna_chart,
-            "chandra_chart": chandra_chart,
-            "planet_positions": planet_positions,
-            "shubh_din": lucky_day,
-            "ishta_devta": ishta_devta,
-            "lucky_number": lucky_number,
-            "lucky_color": lucky_color,
-            "lucky_date": f"{lucky_date} तारीख",
-            "bhagyavardhak_ratna": bhagyavardhak,
-            "jeevan_rakshak_ratna": jeevan_rakshak,
-            "vidya_vardhak_ratna": vidya_vardhak,
-            "mangal_dosha": mangal_dosha_details,
-            "kaalsarp_dosha": kaalsarp_details,
-            "mahadasha": {
-                "starting_planet": ruling_planet,
-                "balance": mahadasha_balance
-            },
-            "predictions": {
-                "study": study_response,
-                "money": money_response,
-                "work": work_response,
-                "marriage": marriage_response,
-                "mahadasha_sadesati": mahadasha_sadesati_response
-            }
         }
     }
-    response = jsonify(result)
+
+    # Prepare the response
+    response = jsonify({
+        "name": name,
+        "birth_date": birth_date,
+        "birth_time": birth_time,
+        "birth_place": birth_place,
+        "latitude": lat,
+        "longitude": lon,
+        "birth_julian_day": birth_jd,
+        "ayanamsa_lahiri": ayanamsa - 0.88,
+        "sunrise_julian_day": sunrise_jd,
+        "sunrise_time": converted_sunrise_time,
+        "ist_kaal": ist_kaal,
+        "lagna_degree": lagna_degree,
+        "lagna_rashi": lagna_rashi,
+        "janam_nakshatra": janam_nakshatra,
+        "janam_charan": janam_charan,
+        "rashi": rashi,
+        "rashi_naam_start_from": planet_positions["चंद्र"]["naming_letter"],
+        "gana": janam_gana,
+        "lagna_chart": lagna_chart,
+        "chandra_chart": chandra_chart,
+        "planet_positions": planet_positions,
+        "shubh_din": lucky_day,
+        "ishta_devta": ishta_devta,
+        "lucky_number": lucky_number,
+        "lucky_color": lucky_color,
+        "lucky_date": f"{lucky_date} तारीख",
+        "bhagyavardhak_ratna": bhagyavardhak,
+        "jeevan_rakshak_ratna": jeevan_rakshak,
+        "vidya_vardhak_ratna": vidya_vardhak,
+        "mangal_dosha": mangal_dosha_details,
+        "kaalsarp_dosha": kaalsarp_details,
+        "mahadasha": {
+            "starting_planet": ruling_planet,
+            "balance": mahadasha_balance
+        },
+        "predictions": {
+            "study": study_response,
+            "money": money_response,
+            "work": work_response,
+            "marriage": marriage_response,
+            "mahadasha_sadesati": mahadasha_sadesati_response
+        }
+    })
     response.headers.add('Access-Control-Allow-Origin', 'https://astrologerinranchi.com')
     return response
 
