@@ -5,7 +5,7 @@ from geopy.geocoders import Nominatim
 
 swe.set_sid_mode(swe.SIDM_LAHIRI)
 app = Flask(__name__)
-CORS(app, resources={r"/kundali": {"origins": "https://astrologerinranchi.com"}})
+CORS(app, resources={r"/kundali": {"origins": "https://astrologerinranchi.com", "methods": ["POST", "OPTIONS"], "allow_headers": ["Content-Type"]}})
 
 def get_lat_lon(birth_place):
     try:
@@ -399,10 +399,18 @@ def build_north_indian_chart(lagna_sign_index, moon_sign_index, planet_positions
     
     return lagna_chart, chandra_chart
     
-@app.route('/kundali', methods=['POST'])
+@app.route('/kundali', methods=['POST', 'OPTIONS'])
 def calculate_kundali():
     if request.method == 'OPTIONS':
-        return '', 204  # Handle preflight request
+        response = '', 204
+        response_headers = {
+            'Access-Control-Allow-Origin': 'https://astrologerinranchi.com',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Accept',
+            'Access-Control-Max-Age': '86400'
+        }
+        return response, response_headers
+            
     data = request.json
     name = data.get("name")
     birth_date = data.get("birth_date")  # Format: YYYY-MM-DD
@@ -830,7 +838,11 @@ def calculate_kundali():
                 "marriage": marriage_response,
                 "mahadasha_sadesati": mahadasha_sadesati_response
             }
-        }), 200
-     
+        }
+    }
+    response = jsonify(result)
+    response.headers.add('Access-Control-Allow-Origin', 'https://astrologerinranchi.com')
+    return response
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)
