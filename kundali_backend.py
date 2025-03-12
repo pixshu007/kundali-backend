@@ -1,12 +1,83 @@
-﻿from flask import Flask, request, jsonify
-from flask_cors import CORS  # Added CORS import
+﻿from flask import Flask, request, jsonify, url_for
+from flask_cors import CORS
 import swisseph as swe
 from datetime import datetime, timedelta, timezone
 from geopy.geocoders import Nominatim
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+import time
 
 swe.set_sid_mode(swe.SIDM_LAHIRI)
 app = Flask(__name__)
 CORS(app, resources={r"/kundali": {"origins": "https://astrologerinranchi.com", "methods": ["POST", "OPTIONS"], "allow_headers": ["Content-Type", "Accept"]}})
+
+# Ensure the static folder exists
+if not os.path.exists('static'):
+    os.makedirs('static')
+
+def draw_north_indian_chart(chart_data, title, filename):
+    """
+    Generate a North Indian-style chart image using matplotlib.
+    
+    Args:
+        chart_data (dict): Dictionary with house numbers (1-12) as keys and sign/planet data as values.
+        title (str): Title of the chart (e.g., "लग्न कुण्डली").
+        filename (str): Filename to save the image in the static folder.
+    """
+    fig, ax = plt.subplots(figsize=(5, 5))
+    ax.set_title(title, fontsize=16, color='white')
+    ax.set_facecolor('#1C2526')  # Dark background matching your theme
+    ax.axis('off')  # Hide axes
+
+    # Draw outer square
+    ax.plot([0, 0, 1, 1, 0], [0, 1, 1, 0, 0], color='white')
+
+    # Draw diagonals
+    ax.plot([0, 1], [0, 1], color='white')
+    ax.plot([0, 1], [1, 0], color='white')
+
+    # Draw lines from center to midpoints
+    ax.plot([0.5, 0], [0.5, 0.5], color='white')
+    ax.plot([0.5, 1], [0.5, 0.5], color='white')
+    ax.plot([0.5, 0.5], [0.5, 0], color='white')
+    ax.plot([0.5, 0.5], [0.5, 1], color='white')
+
+    # Predefined positions for each house (approximate for North Indian layout)
+    positions = [
+        (0.5, 0.8),   # House 1 (top center)
+        (0.65, 0.75), # House 2
+        (0.75, 0.65), # House 3
+        (0.8, 0.5),   # House 4 (right center)
+        (0.75, 0.35), # House 5
+        (0.65, 0.25), # House 6
+        (0.5, 0.2),   # House 7 (bottom center)
+        (0.35, 0.25), # House 8
+        (0.25, 0.35), # House 9
+        (0.2, 0.5),   # House 10 (left center)
+        (0.25, 0.65), # House 11
+        (0.35, 0.75)  # House 12
+    ]
+
+    # Place house numbers, signs, and planets
+    for i in range(1, 13):
+        house_num = i
+        sign = chart_data[house_num]['sign']
+        planets = ', '.join(chart_data[house_num]['planets']) or 'None'
+        text = f"{house_num}\n{sign}\n{planets}"
+        ax.text(positions[i-1][0], positions[i-1][1], text, ha='center', va='center', color='white', fontsize=8)
+
+    # Save the image to the static folder
+    plt.savefig(os.path.join('static', filename), bbox_inches='tight', facecolor='#1C2526')
+    plt.close()
+
+def cleanup_static_folder():
+    """Remove image files older than 24 hours from the static folder."""
+    now = time.time()
+    for filename in os.listdir('static'):
+        filepath = os.path.join('static', filename)
+        if os.path.isfile(filepath) and os.path.getmtime(filepath) < now - 86400:  # 24 hours
+            os.remove(filepath)
 
 def get_lat_lon(birth_place):
     try:
@@ -410,6 +481,9 @@ def calculate_kundali():
             'Access-Control-Max-Age': '86400'
         }
         return response, response_headers
+        
+    # Clean up old images
+    cleanup_static_folder()
             
     data = request.json
     name = data.get("name")
@@ -437,6 +511,16 @@ def calculate_kundali():
     planet_positions = compute_planet_positions(birth_jd, ayanamsa)
     moon_sign_index = planet_positions["चंद्र"]["sign_number"] - 1
     lagna_chart, chandra_chart = build_north_indian_chart(lagna_sign_index, moon_sign_index, planet_positions)
+    
+    # Generate chart images
+    lagna_filename = f"lagna_{name}_{birth_date}_{birth_time}.png".replace(" ", "_").replace(":", "-")
+    chandra_filename = f"chandra_{name}_{birth_date}_{birth_time}.png".replace(" ", "_").replace(":", "-")
+    draw_north_indian_chart(lagna_chart, "लग्न कुण्डली", lagna_filename)
+    draw_north_indian_chart(chandra_chart, "चंद्र कुण्डली", chandra_filename)
+
+    # Generate URLs for the images
+    lagna_image_url = url_for('static', filename=lagna_filename, _external=True)
+    chandra_image_url = url_for('static', filename=chandra_filename, _external=True)
 
     sunrise_jd = get_sunrise_time(birth_jd, lat, lon)
     if sunrise_jd is None:
@@ -807,7 +891,9 @@ def calculate_kundali():
             "work": work_response,
             "marriage": marriage_response,
             "mahadasha_sadesati": mahadasha_sadesati_response
-        }
+        },
+        "lagna_image": lagna_image_url,
+        "chandra_image": chandra_image_url
     })
     response.headers.add('Access-Control-Allow-Origin', 'https://astrologerinranchi.com')
     return response
