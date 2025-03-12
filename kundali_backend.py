@@ -5,6 +5,7 @@ from geopy.geocoders import Nominatim
 
 swe.set_sid_mode(swe.SIDM_LAHIRI)
 app = Flask(__name__)
+CORS(app, resources={r"/kundali": {"origins": "https://astrologerinranchi.com"}})
 
 def get_lat_lon(birth_place):
     try:
@@ -400,6 +401,8 @@ def build_north_indian_chart(lagna_sign_index, moon_sign_index, planet_positions
     
 @app.route('/kundali', methods=['POST'])
 def calculate_kundali():
+    if request.method == 'OPTIONS':
+        return '', 204  # Handle preflight request
     data = request.json
     name = data.get("name")
     birth_date = data.get("birth_date")  # Format: YYYY-MM-DD
