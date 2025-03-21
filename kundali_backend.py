@@ -21,7 +21,17 @@ logger = logging.getLogger(__name__)
 
 swe.set_sid_mode(swe.SIDM_LAHIRI)
 app = Flask(__name__)
-CORS(app, resources={r"/kundali": {"origins": "https://astrologerinranchi.com", "methods": ["POST", "OPTIONS"], "allow_headers": ["Content-Type", "Accept"]}})
+# Allow CORS for all routes, specifically from your frontend domain
+CORS(app, resources={r"/*": {"origins": "https://astrologerinranchi.com"}}, supports_credentials=True)
+
+# Add a custom handler for OPTIONS requests (if needed)
+@app.route('/kundali', methods=['OPTIONS'])
+def handle_options():
+    response = jsonify({"status": "ok"})
+    response.headers['Access-Control-Allow-Origin'] = 'https://astrologerinranchi.com'
+    response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    return response
 
 # Define STATIC_FOLDER (adjust path as needed)
 STATIC_FOLDER = "static"
@@ -693,14 +703,13 @@ def build_north_indian_chart(lagna_sign_index, moon_sign_index, planet_positions
 @app.route('/kundali', methods=['POST', 'OPTIONS'])
 def calculate_kundali():
     if request.method == 'OPTIONS':
-        response = '', 204
-        response_headers = {
-            'Access-Control-Allow-Origin': 'https://astrologerinranchi.com',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Accept',
-            'Access-Control-Max-Age': '86400'
-        }
-        return response, response_headers
+    response = jsonify({"status": "ok"})
+    response.status_code = 200  # Use 200 instead of 204 for debugging
+    response.headers['Access-Control-Allow-Origin'] = 'https://astrologerinranchi.com'
+    response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Accept'
+    response.headers['Access-Control-Max-Age'] = '86400'
+    return response
         
     cleanup_static_folder()    
     data = request.json
