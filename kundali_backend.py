@@ -703,13 +703,13 @@ def build_north_indian_chart(lagna_sign_index, moon_sign_index, planet_positions
 @app.route('/kundali', methods=['POST', 'OPTIONS'])
 def calculate_kundali():
     if request.method == 'OPTIONS':
-    response = jsonify({"status": "ok"})
-    response.status_code = 200  # Use 200 instead of 204 for debugging
-    response.headers['Access-Control-Allow-Origin'] = 'https://astrologerinranchi.com'
-    response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Accept'
-    response.headers['Access-Control-Max-Age'] = '86400'
-    return response
+        response = jsonify({"status": "ok"})
+        response.status_code = 200  # Use 200 instead of 204 for debugging
+        response.headers['Access-Control-Allow-Origin'] = 'https://astrologerinranchi.com'
+        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Accept'
+        response.headers['Access-Control-Max-Age'] = '86400'
+        return response
         
     cleanup_static_folder()    
     data = request.json
