@@ -64,7 +64,7 @@ planet_symbols = {
 def sanitize_filename(filename):
     return "".join(c for c in filename if c.isalnum() or c in ['_', '-', '.'])
 
-# Main function to draw the chart
+# Function to draw North Indian Chart
 def draw_north_indian_chart(chart_data, title, filename):
     try:
         # Clear any previous plot
@@ -101,7 +101,7 @@ def draw_north_indian_chart(chart_data, title, filename):
         ax.plot([0.5, 1], [1, 0.5], color=line_color, linewidth=linewidth)
 
         # Define house bounds for validation
-        SYMBOL_SIZE = 0.072  # Updated for fontsize=18
+        SYMBOL_SIZE = 0.048  # For fontsize=12
         house_bounds = {
             1: (0.35, 0.65, 0.60, 0.90),   # Center-top (House 1)
             2: (0.65, 0.90, 0.00, 0.20),   # Top-right (House 2)
@@ -117,90 +117,118 @@ def draw_north_indian_chart(chart_data, title, filename):
             12: (0.10, 0.35, 0.00, 0.20)   # Top-middle (House 12)
         }
 
-        # Provided coordinates for rashi numbers and planet symbols (with adjustments)
+        # Provided coordinates for rashi numbers and planet symbols (converted to normalized)
         provided_coordinates = {
-            1: {
-                "rashi": (0.4940, 0.7620),
+            1: {  # House 1 (Ascendant house)
+                "rashi": (247/500, (500-119)/500),  # (247, 119) -> (0.4940, 0.7620)
                 "planets": [
-                    (0.3540, 0.7520), (0.4940, 0.8760), (0.6120, 0.7620),
-                    (0.5040, 0.6260), (0.4360, 0.7020)
+                    (210/500, (500-124)/500),  # Adjusted: (0.4200, 0.7520)
+                    (247/500, (500-80)/500),   # Adjusted: (0.4940, 0.8400)
+                    (306/500, (500-119)/500),  # (0.6120, 0.7620)
+                    (252/500, (500-187)/500),  # (0.5040, 0.6260)
+                    (218/500, (500-149)/500)   # (0.4360, 0.7020)
                 ]
             },
-            8: {
-                "rashi": (0.2460, 0.8660),  # Adjusted from (0.246, 0.846)
+            8: {  # House 8 (Second house)
+                "rashi": (123/500, (500-77)/500),  # (123, 77) -> (0.2460, 0.8460)
                 "planets": [
-                    (0.1320, 0.9180), (0.1920, 0.9160), (0.2640, 0.9180),  # Adjusted from (0.948, 0.946, 0.948)
-                    (0.3360, 0.9180)
+                    (80/500, (500-26)/500),   # Adjusted: (0.1600, 0.9480)
+                    (110/500, (500-27)/500),  # Adjusted: (0.2200, 0.9460)
+                    (132/500, (500-26)/500),  # (0.2640, 0.9480)
+                    (168/500, (500-26)/500)   # (0.3360, 0.9480)
                 ]
             },
-            9: {
-                "rashi": (0.1540, 0.7560),
+            9: {  # House 9 (Third house)
+                "rashi": (77/500, (500-122)/500),  # (77, 122) -> (0.1540, 0.7560)
                 "planets": [
-                    (0.0460, 0.8660), (0.0540, 0.8040), (0.0600, 0.7400),
-                    (0.0580, 0.6740)
+                    (23/500, (500-67)/500),   # (0.0460, 0.8660)
+                    (27/500, (500-98)/500),   # (0.0540, 0.8040)
+                    (30/500, (500-130)/500),  # (0.0600, 0.7400)
+                    (29/500, (500-163)/500)   # (0.0580, 0.6740)
                 ]
             },
-            10: {
-                "rashi": (0.2460, 0.5100),
+            10: {  # House 10 (Fourth house)
+                "rashi": (123/500, (500-245)/500),  # (123, 245) -> (0.2460, 0.5100)
                 "planets": [
-                    (0.1200, 0.5080), (0.1780, 0.5720), (0.2560, 0.6360),
-                    (0.3660, 0.5080), (0.2480, 0.3920)
+                    (60/500, (500-246)/500),   # (0.1200, 0.5080)
+                    (89/500, (500-214)/500),   # (0.1780, 0.5720)
+                    (128/500, (500-182)/500),  # (0.2560, 0.6360)
+                    (183/500, (500-246)/500),  # (0.3660, 0.5080)
+                    (124/500, (500-304)/500)   # (0.2480, 0.3920)
                 ]
             },
-            11: {
-                "rashi": (0.1520, 0.2440),
+            11: {  # House 11 (Fifth house)
+                "rashi": (76/500, (500-378)/500),  # (76, 378) -> (0.1520, 0.2440)
                 "planets": [
-                    (0.0520, 0.3620), (0.0560, 0.3020), (0.0600, 0.2320),
-                    (0.0580, 0.1560)
+                    (26/500, (500-319)/500),  # (0.0520, 0.3620)
+                    (28/500, (500-349)/500),  # (0.0560, 0.3020)
+                    (30/500, (500-384)/500),  # (0.0600, 0.2320)
+                    (29/500, (500-422)/500)   # (0.0580, 0.1560)
                 ]
             },
-            12: {
-                "rashi": (0.2500, 0.1480),
+            12: {  # House 12 (Sixth house)
+                "rashi": (125/500, (500-426)/500),  # (125, 426) -> (0.2500, 0.1480)
                 "planets": [
-                    (0.1880, 0.0960), (0.1800, 0.0760), (0.2460, 0.0600),  # Adjusted from (0.14, 0.056)
-                    (0.3380, 0.0600)
+                    (80/500, (500-445)/500),   # Adjusted: (0.1600, 0.1100)
+                    (145/500, (500-455)/500),  # Adjusted: (0.2900, 0.0900)
+                    (80/500, (500-465)/500),   # Adjusted: (0.1600, 0.0700)
+                    (145/500, (500-470)/500)   # Adjusted: (0.2900, 0.0600)
                 ]
             },
-            7: {
-                "rashi": (0.5020, 0.2800),
+            7: {  # House 7 (Seventh house)
+                "rashi": (251/500, (500-360)/500),  # (251, 360) -> (0.5020, 0.2800)
                 "planets": [
-                    (0.4980, 0.3720), (0.4140, 0.3060), (0.3800, 0.2100),
-                    (0.4920, 0.1440), (0.6180, 0.2580)
+                    (249/500, (500-314)/500),  # (0.4980, 0.3720)
+                    (207/500, (500-347)/500),  # (0.4140, 0.3060)
+                    (190/500, (500-395)/500),  # (0.3800, 0.2100)
+                    (246/500, (500-428)/500),  # (0.4920, 0.1440)
+                    (309/500, (500-371)/500)   # (0.6180, 0.2580)
                 ]
             },
-            2: {
-                "rashi": (0.7500, 0.1580),
+            2: {  # House 2 (Eighth house)
+                "rashi": (375/500, (500-421)/500),  # (375, 421) -> (0.7500, 0.1580)
                 "planets": [
-                    (0.6980, 0.1020), (0.6520, 0.0620), (0.7480, 0.0540),
-                    (0.8400, 0.0680)
+                    (355/500, (500-449)/500),  # Adjusted: (0.7100, 0.1020)
+                    (326/500, (500-469)/500),  # (0.6520, 0.0620)
+                    (374/500, (500-473)/500),  # (0.7480, 0.0540)
+                    (420/500, (500-466)/500)   # (0.8400, 0.0680)
                 ]
             },
-            3: {
-                "rashi": (0.8360, 0.2520),
+            3: {  # House 3 (Ninth house)
+                "rashi": (418/500, (500-374)/500),  # (418, 374) -> (0.8360, 0.2520)
                 "planets": [
-                    (0.9420, 0.3540), (0.9280, 0.2800), (0.9300, 0.2040),
-                    (0.9340, 0.1540)
+                    (471/500, (500-323)/500),  # (0.9420, 0.3540)
+                    (464/500, (500-360)/500),  # (0.9280, 0.2800)
+                    (465/500, (500-398)/500),  # (0.9300, 0.2040)
+                    (467/500, (500-423)/500)   # (0.9340, 0.1540)
                 ]
             },
-            4: {
-                "rashi": (0.7500, 0.5000),
+            4: {  # House 4 (Tenth house)
+                "rashi": (375/500, (500-250)/500),  # (375, 250) -> (0.7500, 0.5000)
                 "planets": [
-                    (0.6300, 0.5040), (0.6860, 0.5740), (0.7620, 0.6200),
-                    (0.8580, 0.5080), (0.7560, 0.3900)
+                    (315/500, (500-248)/500),  # (0.6300, 0.5040)
+                    (343/500, (500-213)/500),  # (0.6860, 0.5740)
+                    (381/500, (500-190)/500),  # (0.7620, 0.6200)
+                    (429/500, (500-246)/500),  # (0.8580, 0.5080)
+                    (374/500, (500-305)/500)   # (0.7480, 0.3900)
                 ]
             },
-            5: {
-                "rashi": (0.8380, 0.7540),
+            5: {  # House 5 (Eleventh house)
+                "rashi": (419/500, (500-123)/500),  # (419, 123) -> (0.8380, 0.7540)
                 "planets": [
-                    (0.8940, 0.7940), (0.9380, 0.8500), (0.9220, 0.7040),
-                    (0.9420, 0.6500)
+                    (447/500, (500-103)/500),  # (0.8940, 0.7940)
+                    (469/500, (500-75)/500),   # (0.9380, 0.8500)
+                    (461/500, (500-148)/500),  # (0.9220, 0.7040)
+                    (471/500, (500-175)/500)   # (0.9420, 0.6500)
                 ]
             },
-            6: {
-                "rashi": (0.7460, 0.8500),
+            6: {  # House 6 (Twelfth house) - Reverted to original coordinates
+                "rashi": (373/500, (500-75)/500),  # (373, 75) -> (0.7460, 0.8500)
                 "planets": [
-                    (0.6800, 0.9100), (0.7220, 0.9400), (0.7900, 0.9420),
-                    (0.8480, 0.9260)
+                    (340/500, (500-45)/500),  # Reverted: (0.6800, 0.9100)
+                    (361/500, (500-30)/500),  # (0.7220, 0.9400)
+                    (395/500, (500-29)/500),  # (0.7900, 0.9420)
+                    (424/500, (500-37)/500)   # (0.8480, 0.9260)
                 ]
             }
         }
@@ -233,7 +261,7 @@ def draw_north_indian_chart(chart_data, title, filename):
                 logger.error(f"No coordinates provided for chart house {chart_house}")
                 continue
             rashi_x, rashi_y = provided_coordinates[chart_house]["rashi"]
-            ax.text(rashi_x, rashi_y, str(rashi_number), ha='center', va='center', color='black', fontsize=18, fontweight='bold')  # Updated to 18
+            ax.text(rashi_x, rashi_y, str(rashi_number), ha='center', va='center', color='black', fontsize=18, fontweight='bold')
             logger.debug(f"Placed Rashi {rashi} (number {rashi_number}) at ({rashi_x}, {rashi_y}) in chart house {chart_house}")
 
         # Place planets at provided coordinates
@@ -263,7 +291,7 @@ def draw_north_indian_chart(chart_data, title, filename):
 
             # Get house bounds for validation
             x_min, x_max, y_min, y_max = house_bounds[chart_house]
-            padding = 0.06  # Increased padding
+            padding = 0.04  # Reduced padding
             x_min += padding
             x_max -= padding
             y_min += padding
@@ -281,7 +309,7 @@ def draw_north_indian_chart(chart_data, title, filename):
                 if not (x_min <= pos_x <= x_max and y_min <= pos_y <= y_max):
                     logger.warning(f"House {chart_house}: Planet {planet} at ({pos_x}, {pos_y}) is outside bounds ({x_min}, {x_max}, {y_min}, {y_max})")
                 symbol, color = planet_symbols[planet]
-                ax.text(pos_x, pos_y, symbol, ha='center', va='center', color=color, fontsize=18, fontproperties=hindi_font)  # Updated to 18
+                ax.text(pos_x, pos_y, symbol, ha='center', va='center', color=color, fontsize=12, fontproperties=hindi_font)
                 logger.debug(f"Placed {planet} ({symbol}) at ({pos_x}, {pos_y}) in chart house {chart_house}")
 
         # Save the chart
@@ -294,7 +322,7 @@ def draw_north_indian_chart(chart_data, title, filename):
     except Exception as e:
         logger.exception(f"Error drawing chart: {str(e)}")
         raise
-
+        
 def cleanup_static_folder():
     now = time.time()
     for filename in os.listdir(STATIC_FOLDER):
