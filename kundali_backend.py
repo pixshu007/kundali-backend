@@ -51,11 +51,57 @@ planet_symbols = {
     "बृहस्पति": ("गु", "darkgoldenrod"),
     "शुक्र": ("शु", "magenta"),
     "शनि": ("श", "darkslategray"),
-    "राहु": ("र", "purple"),
+    "राहु": ("रा", "purple"),
     "केतु": ("के", "teal")
 }
 
-# Ratna dictionaries (updated as per provided chart)
+# Rashi lord mapping
+rashi_lord = {
+    "मेष": "मंगल",
+    "वृष": "शुक्र",
+    "मिथुन": "बुध",
+    "कर्क": "चंद्र",
+    "सिंह": "सूर्य",
+    "कन्या": "बुध",
+    "तुला": "शुक्र",
+    "वृश्चिक": "मंगल",
+    "धनु": "बृहस्पति",
+    "मकर": "शनि",
+    "कुंभ": "शनि",
+    "मीन": "बृहस्पति"
+}
+
+# Planet to gemstone mapping (derived from provided dictionaries)
+planet_to_gemstone = {
+    "मंगल": "मूँगा रक्त इटालियन 7 रत्ती सोना या चाँदी में",
+    "शुक्र": "बज्रमणि सफ़ेद / ब्राउन डायमंड 5 रत्ती / हीरा 50 सेंट",
+    "बुध": "पन्ना ब्राज़ीली / पेरिडॉट / ग्रीन तुरमुली 5+ रत्ती चाँदी या प्लैटिनम में",
+    "चंद्र": "नेचुरल मोती 5 रत्ती (चाँदी में)",
+    "सूर्य": "माणिक 5 रत्ती सोना या ब्रॉन्ज़ में",
+    "बृहस्पति": "पीत पुखराज / पीला बज्रमणि 5+ रत्ती सोना या ब्रॉन्ज़ में",
+    "शनि": "बज्रमणि ब्लू / नीलम 5+ रत्ती पंचधातु में",
+    "राहु": "गोमेद 5+ रत्ती चाँदी में",
+    "केतु": "लहसुनिया 5+ रत्ती चाँदी में"
+}
+
+# Exalted signs for planets
+exalted_signs = {
+    "सूर्य": "मेष",
+    "चंद्र": "वृष",
+    "मंगल": "मकर",
+    "बुध": "कन्या",
+    "बृहस्पति": "कर्क",
+    "शुक्र": "मीन",
+    "शनि": "तुला",
+    "राहु": "वृष",
+    "केतु": "वृश्चिक"
+}
+
+# Benefic and malefic planets
+benefics = ["बृहस्पति", "शुक्र", "बुध", "चंद्र"]
+malefics = ["मंगल", "शनि", "राहु", "केतु"]
+
+# Static gemstone dictionaries (for fallback)
 bhagyavardhak_ratna = {
     "मेष": "पीत पुखराज / पीला बज्रमणि 5+ रत्ती सोना या ब्रॉन्ज़ में",
     "वृष": "बज्रमणि ब्लू / नीलम 5+ रत्ती पंचधातु में",
@@ -113,6 +159,73 @@ planet_mantras = {
     "राहु": "ॐ रां राहवे नमः",
     "केतु": "ॐ कें केतवे नमः"
 }
+
+def get_gemstone(house_number, lagna_chart, planet_positions, lagna_sign_index):
+    """
+    Calculate gemstone for a given house based on Rashi lord, planetary strength, and aspects.
+    Args:
+        house_number (int): House number (1, 5, or 9).
+        lagna_chart (dict): Lagna chart with house numbers as keys and {'sign': str, 'planets': list} as values.
+        planet_positions (dict): Planet positions with planet names as keys and {'sign': str, 'rashi_lord': str} as values.
+        lagna_sign_index (int): Index of Lagna Rashi (0-based).
+    Returns:
+        str: Recommended gemstone.
+    """
+    # Get Rashi and lord for the house
+    house_index = (lagna_sign_index + (house_number - 1)) % 12 + 1
+    rashi = lagna_chart[house_index]["sign"]
+    lord = rashi_lord[rashi]
+    
+    # Check if the lord is strong (in own or exalted sign)
+    lord_sign = planet_positions.get(lord, {}).get("sign", "")
+    is_lord_strong = lord_sign == rashi or lord_sign == exalted_signs.get(lord, "")
+    
+    # Check if the lord is benefic
+    is_lord_benefic = lord in benefics
+    
+    # If lord is strong and benefic, use its gemstone
+    if is_lord_strong and is_lord_benefic:
+        return planet_to_gemstone.get(lord, "Unknown")
+    
+    # Check benefic planets in the house
+    house_planets = lagna_chart[house_index]["planets"]
+    for planet in benefics:
+        if planet in house_planets:
+            planet_sign = planet_positions.get(planet, {}).get("sign", "")
+            is_planet_strong = planet_sign == rashi or planet_sign == exalted_signs.get(planet, "")
+            if is_planet_strong:
+                return planet_to_gemstone.get(planet, "Unknown")
+    
+    # Check aspects by benefic planets (Jupiter: 5th/9th, Venus/Mercury: 7th)
+    for planet in benefics:
+        planet_house = None
+        for h in range(1, 13):
+            if planet in lagna_chart[h]["planets"]:
+                planet_house = h
+                break
+        if planet_house:
+            if planet == "बृहस्पति":
+                aspects = [(planet_house + 4) % 12 or 12, (planet_house + 8) % 12 or 12]
+            else:
+                aspects = [(planet_house + 6) % 12 or 12]
+            if house_index in aspects:
+                planet_sign = planet_positions.get(planet, {}).get("sign", "")
+                is_planet_strong = planet_sign == lagna_chart[planet_house]["sign"] or planet_sign == exalted_signs.get(planet, "")
+                if is_planet_strong:
+                    return planet_to_gemstone.get(planet, "Unknown")
+    
+    # Default: Jupiter for 5th/9th, Lagna lord for 1st, or fallback to static dictionary
+    if house_number in [5, 9]:
+        return planet_to_gemstone.get("बृहस्पति", "पीत पुखराज / पीला बज्रमणि 5+ रत्ती सोना या ब्रॉन्ज़ में")
+    elif house_number == 1:
+        return planet_to_gemstone.get(lord, jeevan_rakshak_ratna.get(rashi, "Unknown"))
+    else:
+        # Fallback to static dictionaries
+        if house_number == 5:
+            return vidya_vardhak_ratna.get(rashi, "Unknown")
+        elif house_number == 9:
+            return bhagyavardhak_ratna.get(rashi, "Unknown")
+        return "Unknown"
 
 def draw_north_indian_chart(chart_data, title, filename):
     try:
@@ -346,7 +459,7 @@ def draw_north_indian_chart(chart_data, title, filename):
                 ax.text(pos_x, pos_y, symbol, ha='center', va='center', color=color, fontsize=12, fontproperties=hindi_font)
                 logger.debug(f"Placed {planet} ({symbol}) at ({pos_x}, {pos_y}) in chart house {chart_house}")
 
-        plt.savefig(filepath, bbox_inches='tight', facecolor='white', dpi=100)  # Reduced DPI
+        plt.savefig(filepath, bbox_inches='tight', facecolor='white', dpi=100)
         plt.clf()
         plt.close()
         logger.debug(f"Chart saved to {filepath}")
@@ -445,7 +558,7 @@ def calculate_ist_kaal(birth_time, sunrise_time):
 
 def calculate_mulyank(birth_date):
     try:
-        day = int(birth_date.split('-')[2])  # Extract day (e.g., 23 from 1996-02-23)
+        day = int(birth_date.split('-')[2])
         mulyank = sum(int(digit) for digit in str(day))
         while mulyank > 9:
             mulyank = sum(int(digit) for digit in str(mulyank))
@@ -550,25 +663,7 @@ mahadasha_periods = {
     "बुध": 17
 }
 
-rashi_lord = {
-    "मेष": "मंगल",
-    "वृष": "शुक्र",
-    "मिथुन": "बुध",
-    "कर्क": "चंद्र",
-    "सिंह": "सूर्य",
-    "कन्या": "बुध",
-    "तुला": "शुक्र",
-    "वृश्चिक": "मंगल",
-    "धनु": "बृहस्पति",
-    "मकर": "शनि",
-    "कुंभ": "शनि",
-    "मीन": "बृहस्पति"
-}
-
 dusthana_houses = [6, 8, 12]
-
-malefics = ["मंगल", "शनि", "राहु", "केतु"]
-benefics = ["बृहस्पति", "शुक्र"]
 
 rashi_lucky_days = {
     "मेष": "मंगलवार",
@@ -826,17 +921,10 @@ def calculate_kundali():
     rashi_lord_for_color = planet_positions["चंद्र"]["rashi_lord"]
     lucky_color = planet_lucky_colors.get(rashi_lord_for_color, "Unknown")
 
-    # Ratna calculations (corrected house assignments)
-    first_house_sign = lagna_chart[1]["sign"]
-    jeevan_rakshak = jeevan_rakshak_ratna.get(first_house_sign, "Unknown")
-
-    fifth_house_number = (lagna_sign_index + 4) % 12 + 1
-    fifth_house_sign = lagna_chart[fifth_house_number]["sign"]
-    vidya_vardhak = vidya_vardhak_ratna.get(fifth_house_sign, "Unknown")
-
-    ninth_house_number = (lagna_sign_index + 8) % 12 + 1
-    ninth_house_sign = lagna_chart[ninth_house_number]["sign"]
-    bhagyavardhak = bhagyavardhak_ratna.get(ninth_house_sign, "Unknown")
+    # Gemstone calculations using dynamic logic
+    jeevan_rakshak = get_gemstone(1, lagna_chart, planet_positions, lagna_sign_index)
+    vidya_vardhak = get_gemstone(5, lagna_chart, planet_positions, lagna_sign_index)
+    bhagyavardhak = get_gemstone(9, lagna_chart, planet_positions, lagna_sign_index)
     
     mangal_dosha_houses = [1, 4, 7, 8, 12]
     kendra_houses = [1, 4, 7, 10]
