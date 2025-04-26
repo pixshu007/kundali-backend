@@ -55,6 +55,65 @@ planet_symbols = {
     "केतु": ("के", "teal")
 }
 
+# Ratna dictionaries (updated as per provided chart)
+bhagyavardhak_ratna = {
+    "मेष": "पीत पुखराज / पीला बज्रमणि 5+ रत्ती सोना या ब्रॉन्ज़ में",
+    "वृष": "बज्रमणि ब्लू / नीलम 5+ रत्ती पंचधातु में",
+    "मिथुन": "बज्रमणि ब्लू / नीलम 5+ रत्ती पंचधातु में",
+    "कर्क": "पीत पुखराज / पीला बज्रमणि 5+ रत्ती सोना या ब्रॉन्ज़ में",
+    "सिंह": "मूँगा रक्त इटालियन 7 रत्ती सोना या चाँदी में",
+    "कन्या": "बज्रमणि सफ़ेद / ब्राउन डायमंड 5 रत्ती / हीरा 50 सेंट",
+    "तुला": "पन्ना ब्राज़ीली / पेरिडॉट / ग्रीन तुरमुली 5+ रत्ती चाँदी या प्लैटिनम में",
+    "वृश्चिक": "नेचुरल मोती 5 रत्ती (चाँदी में)",
+    "धनु": "माणिक 5 रत्ती सोना या ब्रॉन्ज़ में",
+    "मकर": "पन्ना ब्राज़ीली / पेरिडॉट / ग्रीन तुरमुली 5+ रत्ती चाँदी या प्लैटिनम में",
+    "कुंभ": "बज्रमणि सफ़ेद / ब्राउन डायमंड 5 रत्ती / हीरा 50 सेंट",
+    "मीन": "मूँगा रक्त इटालियन 7 रत्ती सोना या चाँदी में"
+}
+
+jeevan_rakshak_ratna = {
+    "मेष": "मूँगा रक्त इटालियन 7 रत्ती सोना या चाँदी में",
+    "वृष": "बज्रमणि सफ़ेद / ब्राउन डायमंड 5 रत्ती / हीरा 50 सेंट",
+    "मिथुन": "पन्ना ब्राज़ीली / पेरिडॉट / ग्रीन तुरमुली 5+ रत्ती चाँदी या प्लैटिनम में",
+    "कर्क": "नेचुरल मोती 5 रत्ती (चाँदी में)",
+    "सिंह": "माणिक 5 रत्ती सोना या ब्रॉन्ज़ में",
+    "कन्या": "पन्ना ब्राज़ीली / पेरिडॉट / ग्रीन तुरमुली 5+ रत्ती चाँदी या प्लैटिनम में",
+    "तुला": "बज्रमणि सफ़ेद / ब्राउन डायमंड 5 रत्ती / हीरा 50 सेंट",
+    "वृश्चिक": "मूँगा रक्त इटालियन 7 रत्ती सोना या चाँदी में",
+    "धनु": "पीत पुखराज / पीला बज्रमणि 5+ रत्ती सोना या ब्रॉन्ज़ में",
+    "मकर": "बज्रमणि ब्लू / नीलम 5+ रत्ती पंचधातु में",
+    "कुंभ": "बज्रमणि ब्लू / नीलम 5+ रत्ती पंचधातु में",
+    "मीन": "पीत पुखराज / पीला बज्रमणि 5+ रत्ती सोना या ब्रॉन्ज़ में"
+}
+
+vidya_vardhak_ratna = {
+    "मेष": "मूँगा रक्त इटालियन 7 रत्ती सोना या चाँदी में",
+    "वृष": "बज्रमणि सफ़ेद / ब्राउन डायमंड 5 रत्ती / हीरा 50 सेंट",
+    "मिथुन": "पन्ना ब्राज़ीली / पेरिडॉट / ग्रीन तुरमुली 5+ रत्ती चाँदी या प्लैटिनम में",
+    "कर्क": "नेचुरल मोती 5 रत्ती (चाँदी में)",
+    "सिंह": "माणिक 5 रत्ती सोना या ब्रॉन्ज़ में",
+    "कन्या": "पन्ना ब्राज़ीली / पेरिडॉट / ग्रीन तुरमुली 5+ रत्ती चाँदी या प्लैटिनम में",
+    "तुला": "बज्रमणि सफ़ेद / ब्राउन डायमंड 5 रत्ती / हीरा 50 सेंट",
+    "वृश्चिक": "मूँगा रक्त इटालियन 7 रत्ती सोना या चाँदी में",
+    "धनु": "पीत पुखराज / पीला बज्रमणि 5+ रत्ती सोना या ब्रॉन्ज़ में",
+    "मकर": "बज्रमणि ब्लू / नीलम 5+ रत्ती पंचधातु में",
+    "कुंभ": "बज्रमणि ब्लू / नीलम 5+ रत्ती पंचधातु में",
+    "मीन": "पीत पुखराज / पीला बज्रमणि 5+ रत्ती सोना या ब्रॉन्ज़ में"
+}
+
+# Planet mantras for Mahadasha
+planet_mantras = {
+    "सूर्य": "ॐ घृणिः सूर्याय नमः",
+    "चंद्र": "ॐ सों सोमाय नमः",
+    "मंगल": "ॐ अं अंगारकाय नमः",
+    "बुध": "ॐ बुं बुद्धाय नमः",
+    "बृहस्पति": "ॐ बृं बृहस्पतये नमः",
+    "शुक्र": "ॐ शुं शुक्राय नमः",
+    "शनि": "ॐ शं शनैश्चराय नमः",
+    "राहु": "ॐ रां राहवे नमः",
+    "केतु": "ॐ कें केतवे नमः"
+}
+
 def draw_north_indian_chart(chart_data, title, filename):
     try:
         plt.clf()
@@ -384,6 +443,18 @@ def calculate_ist_kaal(birth_time, sunrise_time):
         logger.error(f"Error in calculate_ist_kaal: {e}")
         return None
 
+def calculate_mulyank(birth_date):
+    try:
+        day = int(birth_date.split('-')[2])  # Extract day (e.g., 23 from 1996-02-23)
+        mulyank = sum(int(digit) for digit in str(day))
+        while mulyank > 9:
+            mulyank = sum(int(digit) for digit in str(mulyank))
+        logger.debug(f"Calculated Mulyank for day {day} = {mulyank}")
+        return mulyank
+    except Exception as e:
+        logger.error(f"Error in calculate_mulyank: {e}")
+        return None
+
 def compute_lagna(birth_jd, lat, lon, ayanamsa):
     sidereal_time = (swe.sidtime(birth_jd) * 15 + lon) % 360
     logger.debug(f"Sidereal Time = {sidereal_time}°")
@@ -501,7 +572,7 @@ benefics = ["बृहस्पति", "शुक्र"]
 
 rashi_lucky_days = {
     "मेष": "मंगलवार",
-    "वृषभ": "शुक्रवार",
+    "वृष": "शुक्रवार",
     "मिथुन": "बुधवार",
     "कर्क": "सोमवार",
     "सिंह": "रविवार",
@@ -516,7 +587,7 @@ rashi_lucky_days = {
 
 rashi_ishta_devta = {
     "मेष": "पंचमुखी हनुमान",
-    "वृषभ": "भवानी शंकर",
+    "वृष": "भवानी शंकर",
     "मिथुन": "गणेश जी",
     "कर्क": "भवानी शंकर",
     "सिंह": "भगवान सूर्य",
@@ -531,7 +602,7 @@ rashi_ishta_devta = {
 
 rashi_numbers = {
     "मेष": 1,
-    "वृषभ": 2,
+    "वृष": 2,
     "मिथुन": 3,
     "कर्क": 4,
     "सिंह": 5,
@@ -552,51 +623,6 @@ planet_lucky_colors = {
     "सूर्य": "नारंगी",
     "बृहस्पति": "पीला",
     "शनि": "नीला"
-}
-
-bhagyavardhak_ratna = {
-    "मेष": "पीत पुखराज 4.5 रत्ती",
-    "वृषभ": "ब्रजमनी ब्लू 5 रत्ती",
-    "मिथुन": "ब्रजमनी ब्लू 5 रत्ती",
-    "कर्क": "पीत पुखराज 4.5 रत्ती",
-    "सिंह": "मूँगा रक्त इटालियन 7 रत्ती",
-    "कन्या": "ब्रजमनी सफ़ेद 5 रत्ती",
-    "तुला": "पन्ना ब्राज़ीली 4.5 रत्ती",
-    "वृश्चिक": "नेचुरल मोती 5 रत्ती (चांदी में)",
-    "धनु": "माणिक 5 रत्ती",
-    "मकर": "पन्ना ब्राज़ीली 4.5 रत्ती",
-    "कुंभ": "ब्रजमनी सफ़ेद 5 रत्ती",
-    "मीन": "मूँगा रक्त इटालियन 7 रत्ती"
-}
-
-jeevan_rakshak_ratna = {
-    "मेष": "मूँगा रक्त इटालियन 7 रत्ती",
-    "वृषभ": "ब्रजमनी सफ़ेद 5 रत्ती",
-    "मिथुन": "पन्ना ब्राज़ीली 4.5 रत्ती",
-    "कर्क": "नेचुरल मोती 5 रत्ती (चांदी में)",
-    "सिंह": "माणिक 5 रत्ती",
-    "कन्या": "पन्ना ब्राज़ीली 4.5 रत्ती",
-    "तुला": "डायमंड 50 सेंट अभाव में सफ़ेद बज्रमणि 5 रत्ती",
-    "वृश्चिक": "मूँगा रक्त इटालियन 7 रत्ती गोल्ड या ब्रॉन्ज़ में",
-    "धनु": "पीत पुखराज 4.5 रत्ती",
-    "मकर": "ब्रजमनी ब्लू 5 रत्ती",
-    "कुंभ": "ब्रजमनी ब्लू 5 रत्ती",
-    "मीन": "पीत पुखराज 4.5 रत्ती"
-}
-
-vidya_vardhak_ratna = {
-    "मेष": "मूँगा रक्त इटालियन 7 रत्ती",
-    "वृषभ": "ब्रजमनी सफ़ेद 5 रत्ती",
-    "मिथुन": "पन्ना ब्राज़ीली 4.5 रत्ती",
-    "कर्क": "नेचुरल मोती 5 रत्ती (चांदी में)",
-    "सिंह": "माणिक 5 रत्ती",
-    "कन्या": "पन्ना ब्राज़ीली 4.5 रत्ती",
-    "तुला": "डायमंड 50 सेंट अभाव में सफ़ेद बज्रमणि 5 रत्ती",
-    "वृश्चिक": "मूँगा रक्त इटालियन 7 रत्ती गोल्ड या ब्रॉन्ज़ में",
-    "धनु": "पीत पुखराज 4.5 रत्ती",
-    "मकर": "ब्रजमनी ब्लू 5 रत्ती",
-    "कुंभ": "ब्रजमनी ब्लू 5 रत्ती",
-    "मीन": "पीत पुखराज 4.5 रत्ती"
 }
 
 def calculate_nakshatra_and_charan(sidereal_pos):
@@ -687,11 +713,8 @@ def build_north_indian_chart(lagna_sign_index, moon_sign_index, planet_positions
     return lagna_chart, chandra_chart
 
 def calculate_lucky_number(birth_date):
-    # Extract digits from birth_date (e.g., "1996-02-23" -> "19960223")
     digits = ''.join(filter(str.isdigit, birth_date))
-    # Sum all digits
     lucky_number = sum(int(digit) for digit in digits)
-    # Reduce to a single digit
     while lucky_number > 9:
         lucky_number = sum(int(digit) for digit in str(lucky_number))
     return lucky_number
@@ -699,14 +722,12 @@ def calculate_lucky_number(birth_date):
 def calculate_lucky_dates(lucky_number):
     lucky_dates = []
     for date in range(1, 32):
-        # Calculate sum of digits for the date
         digit_sum = sum(int(digit) for digit in str(date))
-        # Reduce to a single digit if necessary
         while digit_sum > 9:
             digit_sum = sum(int(digit) for digit in str(digit_sum))
         if digit_sum == lucky_number:
             lucky_dates.append(date)
-        if len(lucky_dates) >= 3:  # Stop after finding 3 dates
+        if len(lucky_dates) >= 3:
             break
     return lucky_dates
 
@@ -793,23 +814,21 @@ def calculate_kundali():
 
     twelfth_house_number = (lagna_sign_index + 11) % 12 + 1
     twelfth_house_sign = lagna_chart[twelfth_house_number]["sign"]
-    twelfth_house_rashi_lord = rashi_lord.get(twelfth_house_sign, "Unknown")
     ishta_devta = rashi_ishta_devta.get(twelfth_house_sign, "Unknown")
 
-    # Calculate Lucky Number
+    # Calculate Mulyank and Lucky Number
+    mulyank = calculate_mulyank(birth_date)
     lucky_number = calculate_lucky_number(birth_date)
-    logger.debug(f"Lucky Number = {lucky_number}")
-
-    # Calculate Lucky Dates
     lucky_dates = calculate_lucky_dates(lucky_number)
     lucky_dates_str = ", ".join(str(date) for date in lucky_dates) + " तारीख"
-    logger.debug(f"Lucky Dates = {lucky_dates_str}")
+    logger.debug(f"Lucky Number = {lucky_number}, Lucky Dates = {lucky_dates_str}")
 
     rashi_lord_for_color = planet_positions["चंद्र"]["rashi_lord"]
     lucky_color = planet_lucky_colors.get(rashi_lord_for_color, "Unknown")
 
+    # Ratna calculations (corrected house assignments)
     first_house_sign = lagna_chart[1]["sign"]
-    bhagyavardhak = bhagyavardhak_ratna.get(first_house_sign, "Unknown")
+    jeevan_rakshak = jeevan_rakshak_ratna.get(first_house_sign, "Unknown")
 
     fifth_house_number = (lagna_sign_index + 4) % 12 + 1
     fifth_house_sign = lagna_chart[fifth_house_number]["sign"]
@@ -817,7 +836,7 @@ def calculate_kundali():
 
     ninth_house_number = (lagna_sign_index + 8) % 12 + 1
     ninth_house_sign = lagna_chart[ninth_house_number]["sign"]
-    jeevan_rakshak = jeevan_rakshak_ratna.get(ninth_house_sign, "Unknown")
+    bhagyavardhak = bhagyavardhak_ratna.get(ninth_house_sign, "Unknown")
     
     mangal_dosha_houses = [1, 4, 7, 8, 12]
     kendra_houses = [1, 4, 7, 10]
@@ -926,11 +945,11 @@ def calculate_kundali():
         study_problem_reasons.append(f"पांचवे घर में पाप ग्रह {', '.join(malefic_planets)} हैं")
 
     if study_problem:
-        study_statement = f"पढ़ाई में समस्याएं आ सकती हैं क्योंकि {', '.join(study_problem_reasons)}।"
-        study_resolution = "समस्या का समाधान 1-3 साल में हो सकता है।"
+        study_statement = f"पढ़ाई में बाधाएँ आ सकती हैं क्योंकि {', '.join(study_problem_reasons)}।"
+        study_resolution = "माँ सरस्वती की कृपा हेतु प्रतिदिन \"ॐ ऐं सरस्वत्यै नमः\" मंत्र का 108 बार जाप करें। (विस्तृत जानकारी के लिए आप हमारी वेबसाइट से व्यक्तिगत कुंडली ऑर्डर कर सकते हैं, नीचे दिए गए लिंक और नंबर देखें।)"
     else:
-        study_statement = "पढ़ाई में कोई बड़ी समस्या नहीं है।"
-        study_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
+        study_statement = "पढ़ाई में सफलता के प्रबल योग बन रहे हैं।"
+        study_resolution = "माँ सरस्वती का आशीर्वाद बनाए रखने हेतु \"ॐ ऐं सरस्वत्यै नमः\" मंत्र का नियमित जाप करें। (विस्तृत जानकारी के लिए आप हमारी वेबसाइट से व्यक्तिगत कुंडली ऑर्डर कर सकते हैं, नीचे दिए गए लिंक और नंबर देखें।)"
 
     study_response = {
         "statement": study_statement,
@@ -965,11 +984,11 @@ def calculate_kundali():
         money_problem_reasons.append(f"ग्यारहवें घर में पाप ग्रह {', '.join(malefic_planets)} हैं")
 
     if money_problem:
-        money_statement = f"धन संबंधी समस्याएं आ सकती हैं क्योंकि {', '.join(money_problem_reasons)}।"
-        money_resolution = "समस्या का समाधान 1-2 साल में हो सकता है।"
+        money_statement = f"धन संबंधी परेशानियाँ हो सकती हैं क्योंकि {', '.join(money_problem_reasons)}।"
+        money_resolution = "महालक्ष्मी की कृपा हेतु शुक्रवार को \"ॐ श्रीं ह्रीं क्लीं महालक्ष्म्यै नमः\" मंत्र का 108 बार जाप करें। (विस्तृत जानकारी के लिए आप हमारी वेबसाइट से व्यक्तिगत कुंडली ऑर्डर कर सकते हैं, नीचे दिए गए लिंक और नंबर देखें।)"
     else:
-        money_statement = "धन संबंधी कोई बड़ी समस्या नहीं है।"
-        money_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
+        money_statement = "धन प्राप्ति के लिए शुभ योग बन रहे हैं।"
+        money_resolution = "लक्ष्मी माता का आशीर्वाद बनाए रखने हेतु \"ॐ श्रीं ह्रीं क्लीं महालक्ष्म्यै नमः\" मंत्र का नियमित जाप करें। (विस्तृत जानकारी के लिए आप हमारी वेबसाइट से व्यक्तिगत कुंडली ऑर्डर कर सकते हैं, नीचे दिए गए लिंक और नंबर देखें।)"
 
     money_response = {
         "statement": money_statement,
@@ -992,11 +1011,11 @@ def calculate_kundali():
         work_problem_reasons.append(f"दसवें घर में पाप ग्रह {', '.join(malefic_planets)} हैं")
 
     if work_problem:
-        work_statement = f"कार्यक्षेत्र में चुनौतियाँ आ सकती हैं क्योंकि {', '.join(work_problem_reasons)}।"
-        work_resolution = "समस्या का समाधान 1-3 साल में हो सकता है।"
+        work_statement = f"कार्यक्षेत्र में चुनौतियाँ संभव हैं क्योंकि {', '.join(work_problem_reasons)}।"
+        work_resolution = "हनुमान जी की कृपा हेतु मंगलवार को \"ॐ हं हनुमते नमः\" मंत्र का 108 बार जाप करें। (विस्तृत जानकारी के लिए आप हमारी वेबसाइट से व्यक्तिगत कुंडली ऑर्डर कर सकते हैं, नीचे दिए गए लिंक और नंबर देखें।)"
     else:
-        work_statement = "कार्यक्षेत्र में कोई बड़ी समस्या नहीं है।"
-        work_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
+        work_statement = "कार्यक्षेत्र में उन्नति के शुभ योग हैं।"
+        work_resolution = "हनुमान जी का आशीर्वाद बनाए रखने हेतु \"ॐ हं हनुमते नमः\" मंत्र का नियमित जाप करें। (विस्तृत जानकारी के लिए आप हमारी वेबसाइट से व्यक्तिगत कुंडली ऑर्डर कर सकते हैं, नीचे दिए गए लिंक और नंबर देखें।)"
 
     work_response = {
         "statement": work_statement,
@@ -1019,11 +1038,11 @@ def calculate_kundali():
         marriage_problem_reasons.append(f"सातवें घर में पाप ग्रह {', '.join(malefic_planets)} हैं")
 
     if marriage_problem:
-        marriage_statement = f"विवाह में समस्याएं आ सकती हैं क्योंकि {', '.join(marriage_problem_reasons)}।"
-        marriage_resolution = "समस्या का समाधान 1-2 साल में हो सकता है।"
+        marriage_statement = f"विवाह में देरी या बाधाएँ हो सकती हैं क्योंकि {', '.join(marriage_problem_reasons)}।"
+        marriage_resolution = "माँ पार्वती की कृपा हेतु \"ॐ उमायै नमः\" मंत्र का 108 बार जाप करें। (विस्तृत जानकारी के लिए आप हमारी वेबसाइट से व्यक्तिगत कुंडली ऑर्डर कर सकते हैं, नीचे दिए गए लिंक और नंबर देखें।)"
     else:
-        marriage_statement = "विवाह में कोई बड़ी समस्या नहीं है।"
-        marriage_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
+        marriage_statement = "विवाह के लिए शुभ संयोग बन रहे हैं।"
+        marriage_resolution = "शिव-पार्वती का आशीर्वाद बनाए रखने हेतु \"ॐ उमायै नमः\" मंत्र का नियमित जाप करें। (विस्तृत जानकारी के लिए आप हमारी वेबसाइट से व्यक्तिगत कुंडली ऑर्डर कर सकते हैं, नीचे दिए गए लिंक और नंबर देखें।)"
 
     marriage_response = {
         "statement": marriage_statement,
@@ -1040,18 +1059,18 @@ def calculate_kundali():
             sade_sati = True
 
     if mahadasha_problem:
-        mahadasha_statement = f"महादशा के कारण समस्याएं आ सकती हैं क्योंकि वर्तमान महादशा ग्रह {ruling_planet} एक पाप ग्रह है।"
-        mahadasha_resolution = "समस्या का समाधान अगली महादशा तक हो सकता है।"
+        mahadasha_statement = f"महादशा के कारण जीवन में उतार-चढ़ाव संभव हैं क्योंकि {ruling_planet} एक पाप ग्रह है।"
+        mahadasha_resolution = f"{ruling_planet} की शांति हेतु \"{planet_mantras[ruling_planet]}\" मंत्र का 108 बार जाप करें। (विस्तृत जानकारी के लिए आप हमारी वेबसाइट से व्यक्तिगत कुंडली ऑर्डर कर सकते हैं, नीचे दिए गए लिंक और नंबर देखें।)"
     else:
-        mahadasha_statement = "महादशा के कारण कोई बड़ी समस्या नहीं है।"
-        mahadasha_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
+        mahadasha_statement = "महादशा अनुकूल है और जीवन में स्थिरता लाएगी।"
+        mahadasha_resolution = f"{ruling_planet} का आशीर्वाद बनाए रखने हेतु \"{planet_mantras[ruling_planet]}\" मंत्र का नियमित जाप करें। (विस्तृत जानकारी के लिए आप हमारी वेबसाइट से व्यक्तिगत कुंडली ऑर्डर कर सकते हैं, नीचे दिए गए लिंक और नंबर देखें।)"
 
     if sade_sati:
-        sade_sati_statement = "साढ़ेसाती के कारण जीवन में कठिनाइयाँ आ सकती हैं क्योंकि शनि चंद्र से निकट स्थिति में है।"
-        sade_sati_resolution = "समस्या का समाधान 7.5 साल तक हो सकता है।"
+        sade_sati_statement = "साढ़ेसाती के प्रभाव से जीवन में कठिनाइयाँ आ सकती हैं क्योंकि शनि चंद्रमा के निकट है।"
+        sade_sati_resolution = "शनि देव की कृपा हेतु शनिवार को \"ॐ शं शनैश्चराय नमः\" मंत्र का 108 बार जाप करें। (विस्तृत जानकारी के लिए आप हमारी वेबसाइट से व्यक्तिगत कुंडली ऑर्डर कर सकते हैं, नीचे दिए गए लिंक और नंबर देखें।)"
     else:
-        sade_sati_statement = "साढ़ेसाती के कारण कोई बड़ी समस्या नहीं है।"
-        sade_sati_resolution = "कोई विशेष उपाय की आवश्यकता नहीं है।"
+        sade_sati_statement = "साढ़ेसाती का प्रभाव न्यूनतम है।"
+        sade_sati_resolution = "शनि देव का आशीर्वाद बनाए रखने हेतु \"ॐ शं शनैश्चराय नमः\" मंत्र का नियमित जाप करें। (विस्तृत जानकारी के लिए आप हमारी वेबसाइट से व्यक्तिगत कुंडली ऑर्डर कर सकते हैं, नीचे दिए गए लिंक और नंबर देखें।)"
 
     mahadasha_sadesati_response = {
         "mahadasha_problem": {
@@ -1069,6 +1088,7 @@ def calculate_kundali():
         "birth_date": birth_date,
         "birth_time": birth_time,
         "birth_place": birth_place,
+        "mulyank": mulyank,
         "latitude": lat,
         "longitude": lon,
         "birth_julian_day": birth_jd,
