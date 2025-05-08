@@ -1236,6 +1236,6 @@ def calculate_kundali():
         response.headers.add('Access-Control-Allow-Origin', 'https://astrologerinranchi.com')
         logger.debug("Response prepared successfully")
         return response
-
+        
         if __name__ == '__main__':
-        app.run(host='0.0.0.0', port=5000)
+            app.run(host='0.0.0.0', port=5000)
