@@ -7,6 +7,7 @@
 # - Handles CORS for https://astrologerinranchi.com.
 # - Caches geolocation data and cleans up static files periodically.
 # Dependencies: flask, flask_cors, swisseph, geopy, matplotlib, numpy
+# Note: Requires 'NotoSansDevanagari-Regular.ttf' in 'fonts' directory.
 
 from flask import Flask, request, jsonify, url_for
 from flask_cors import CORS
@@ -47,6 +48,10 @@ def handle_options():
     return response
 
 STATIC_FOLDER = "static"
+
+# Ensure static folder exists
+if not os.path.exists(STATIC_FOLDER):
+    os.makedirs(STATIC_FOLDER)
 
 def sanitize_filename(filename):
     invalid_chars = r'[<>:"/\\|?*]+'
@@ -231,7 +236,7 @@ def draw_north_indian_chart(chart_data, title, filename):
         timestamp = int(time.time() * 1000)
         filename = f"{filename.split('.png')[0]}_{timestamp}.png"
         sanitized_filename = sanitize_filename(filename)
-        filepath = os.path.join("static", sanitized_filename)
+        filepath = os.path.join(STATIC_FOLDER, sanitized_filename)
         logger.debug(f"Saving chart to: {filepath}")
 
         font_path = os.path.join(os.path.dirname(__file__), "fonts", "NotoSansDevanagari-Regular.ttf")
@@ -528,7 +533,7 @@ def get_sunrise_time(julian_day, lat, lon):
         logger.debug(f"Input to get_sunrise_time -> JD: {julian_day}, Lat: {lat}, Lon: {lon}")
         jd_ut = float(julian_day)
         geopos = (lon, lat, 0)
-        res, tret = swe.rise_trans(jd_ut, swe.SUN, swe.CALC_RISE, geopos)
+        res, tret = swe.rise_trans(jd_ut, swe.SUN, geopos, swe.CALC_RISE)
         if res == 0 and isinstance(tret, tuple):
             sunrise_jd = tret[0]
             logger.debug(f"Calculated Sunrise JD = {sunrise_jd}")
@@ -575,19 +580,22 @@ def calculate_mulyank(birth_date):
         return None
 
 def compute_lagna(birth_jd, lat, lon, ayanamsa):
-    sidereal_time = (swe.sidtime(birth_jd) * 15 + lon) % 360
-    logger.debug(f"Sidereal Time = {sidereal_time}°")
-    houses, ascmc = swe.houses(birth_jd, lat, lon, b'A')
-    ascendant_degree = float(ascmc[0])
-    logger.debug(f"Swiss Ephemeris Ascendant Degree = {ascendant_degree}°")
-    ascendant_degree_corrected = (ascendant_degree - ayanamsa) % 360
-    logger.debug(f"Corrected Ascendant Degree After Ayanamsa = {ascendant_degree_corrected}°")
-    rashi_names = ["मेष", "वृष", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक",
-                   "धनु", "मकर", "कुंभ", "मीन"]
-    lagna_sign_index = int(ascendant_degree_corrected // 30) % 12
-    lagna_rashi = rashi_names[lagna_sign_index]
-    logger.debug(f"Assigned Lagna Rashi = {lagna_rashi}")
-    return ascendant_degree_corrected, lagna_rashi
+    try:
+        sidereal_time = (swe.sidtime(birth_jd) * 15 + lon) % 360
+        logger.debug(f"Sidereal Time = {sidereal_time}°")
+        houses, ascmc = swe.houses(birth_jd, lat, lon, b'A')
+        ascendant_degree = float(ascmc[0])
+        logger.debug(f"Swiss Ephemeris Ascendant Degree = {ascendant_degree}°")
+        ascendant_degree_corrected = (ascendant_degree - ayanamsa) % 360
+        logger.debug(f"Corrected Ascendant Degree After Ayanamsa = {ascendant_degree_corrected}°")
+        rashi_names = ["मेष", "वृष", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुंभ", "मीन"]
+        lagna_sign_index = int(ascendant_degree_corrected // 30) % 12
+        lagna_rashi = rashi_names[lagna_sign_index]
+        logger.debug(f"Assigned Lagna Rashi = {lagna_rashi}")
+        return ascendant_degree_corrected, lagna_rashi
+    except Exception as e:
+        logger.error(f"Error in compute_lagna: {e}")
+        raise
 
 nakshatra_letters = {
     "अश्विनी": ["च", "चि", "चु", "चे"],
@@ -758,8 +766,7 @@ def compute_planet_positions(birth_jd, ayanamsa):
         "केतु": swe.MEAN_NODE
     }
     positions = {}
-    rashi_names = ["मेष", "वृष", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक",
-                   "धनु", "मकर", "कुंभ", "मीन"]
+    rashi_names = ["मेष", "वृष", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुंभ", "मीन"]
     
     for planet, swe_id in planets.items():
         result = swe.calc_ut(birth_jd, swe_id)
@@ -795,8 +802,7 @@ def compute_planet_positions(birth_jd, ayanamsa):
     return positions
 
 def build_north_indian_chart(lagna_sign_index, moon_sign_index, planet_positions):
-    rashi_names = ["मेष", "वृष", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक",
-                   "धनु", "मकर", "कुंभ", "मीन"]
+    rashi_names = ["मेष", "वृष", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुंभ", "मीन"]
     
     lagna_sign_number = lagna_sign_index + 1
     moon_sign_number = moon_sign_index + 1
@@ -832,29 +838,43 @@ def calculate_lucky_dates(lucky_number):
             break
     return lucky_dates
 
+def check_sade_sati(moon_house, saturn_house, lagna_chart):
+    """
+    Check for Sade Sati based on Saturn's position relative to Moon's house.
+    """
+    if not moon_house or not saturn_house:
+        return False
+    # Sade Sati occurs when Saturn is in the 12th, 1st, or 2nd house from Moon
+    moon_sign_number = lagna_chart[moon_house]["sign"]
+    moon_sign_index = ["मेष", "वृष", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुंभ", "मीन"].index(moon_sign_number)
+    saturn_sign_number = lagna_chart[saturn_house]["sign"]
+    saturn_sign_index = ["मेष", "वृष", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुंभ", "मीन"].index(saturn_sign_number)
+    relative_position = (saturn_sign_index - moon_sign_index) % 12
+    return relative_position in [0, 1, 11]  # 1st, 2nd, or 12th house
+
 @app.route('/kundali', methods=['POST', 'OPTIONS'])
 def calculate_kundali():
-    if request.method == 'OPTIONS':
-        response = jsonify({"status": "ok"})
-        response.status_code = 200
-        response.headers['Access-Control-Allow-Origin'] = 'https://astrologerinranchi.com'
-        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Accept'
-        response.headers['Access-Control-Max-Age'] = '86400'
-        return response
-        
-    cleanup_static_folder()    
-    data = request.json
-    name = data.get("name")
-    birth_date = data.get("birth_date")
-    birth_time = data.get("birth_time")
-    birth_place = data.get("birth_place")
-
-    if not all([birth_date, birth_time, birth_place]):
-        logger.error("Missing required fields")
-        return jsonify({"error": "Missing required fields: name, birth_date, birth_time, birth_place"}), 400
-
     try:
+        if request.method == 'OPTIONS':
+            response = jsonify({"status": "ok"})
+            response.status_code = 200
+            response.headers['Access-Control-Allow-Origin'] = 'https://astrologerinranchi.com'
+            response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Accept'
+            response.headers['Access-Control-Max-Age'] = '86400'
+            return response
+            
+        cleanup_static_folder()    
+        data = request.json
+        name = data.get("name")
+        birth_date = data.get("birth_date")
+        birth_time = data.get("birth_time")
+        birth_place = data.get("birth_place")
+
+        if not all([birth_date, birth_time, birth_place]):
+            logger.error("Missing required fields")
+            return jsonify({"error": "Missing required fields: name, birth_date, birth_time, birth_place"}), 400
+
         # Validate date format (YYYY-MM-DD)
         if not re.match(r'^\d{4}-\d{2}-\d{2}$', birth_date):
             raise ValueError("Invalid birth_date format. Use YYYY-MM-DD")
@@ -874,8 +894,7 @@ def calculate_kundali():
         logger.debug(f"Ayanamsa = {ayanamsa}")
 
         lagna_degree, lagna_rashi = compute_lagna(birth_jd, lat, lon, ayanamsa)
-        lagna_sign_index = ["मेष", "वृष", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक",
-                            "धनु", "मकर", "कुंभ", "मीन"].index(lagna_rashi)
+        lagna_sign_index = ["मेष", "वृष", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुंभ", "मीन"].index(lagna_rashi)
 
         planet_positions = compute_planet_positions(birth_jd, ayanamsa)
         moon_sign_index = planet_positions["चंद्र"]["sign_number"] - 1
@@ -1104,13 +1123,13 @@ def calculate_kundali():
         tenth_house_number = (lagna_sign_index + 9) % 12 + 1
         tenth_house_sign = lagna_chart[tenth_house_number]["sign"]
         tenth_house_lord = rashi_lord[tenth_house_sign]
-        tenth_lord_house = get_planet_house(tenth_house_lord, lagna_chart)
+        tenth_house_lord_house = get_planet_house(tenth_house_lord, lagna_chart)
 
         work_problem = False
         work_problem_reasons = []
-        if tenth_lord_house is not None and tenth_lord_house in dusthana_houses:
+        if tenth_house_lord_house is not None and tenth_house_lord_house in dusthana_houses:
             work_problem = True
-            work_problem_reasons.append(f"दसवें घर का स्वामी {tenth_house_lord} दुष्टान घर {tenth_lord_house} में है")
+            work_problem_reasons.append(f"दसवें घर का स्वामी {tenth_house_lord} दुष्टान घर {tenth_house_lord_house} में है")
         if any(planet in lagna_chart[tenth_house_number]["planets"] for planet in malefics):
             work_problem = True
             malefic_planets = [planet for planet in lagna_chart[tenth_house_number]["planets"] if planet in malefics]
@@ -1131,13 +1150,13 @@ def calculate_kundali():
         seventh_house_number = (lagna_sign_index + 6) % 12 + 1
         seventh_house_sign = lagna_chart[seventh_house_number]["sign"]
         seventh_house_lord = rashi_lord[seventh_house_sign]
-        seventh_lord_house = get_planet_house(seventh_house_lord, lagna_chart)
+        seventh_house_lord_house = get_planet_house(seventh_house_lord, lagna_chart)
 
         marriage_problem = False
         marriage_problem_reasons = []
-        if seventh_lord_house is not None and seventh_lord_house in dusthana_houses:
+        if seventh_house_lord_house is not None and seventh_house_lord_house in dusthana_houses:
             marriage_problem = True
-            marriage_problem_reasons.append(f"सातवें घर का स्वामी {seventh_house_lord} दुष्टान घर {seventh_lord_house} में है")
+            marriage_problem_reasons.append(f"सातवें घर का स्वामी {seventh_house_lord} दुष्टान घर {seventh_house_lord_house} में है")
         if any(planet in lagna_chart[seventh_house_number]["planets"] for planet in malefics):
             marriage_problem = True
             malefic_planets = [planet for planet in lagna_chart[seventh_house_number]["planets"] if planet in malefics]
@@ -1158,84 +1177,48 @@ def calculate_kundali():
         mahadasha_problem = ruling_planet in malefics
         moon_house = get_planet_house("चंद्र", lagna_chart)
         saturn_house = get_planet_house("शनि", lagna_chart)
-        sade_sati = False
-        if moon_house and saturn_house:
-            relative_position = (saturn_house - moon_house) % 12
-            if relative_position in [0, 1, 11]:
-                sade_sati = True
+        sade_sati = check_sade_sati(moon_house, saturn_house, lagna_chart)
 
-        if mahadasha_problem:
-            mahadasha_statement = f"महादशा के कारण जीवन में उतार-चढ़ाव संभव हैं क्योंकि {ruling_planet} एक पाप ग्रह है।"
-            mahadasha_resolution = f"{ruling_planet} की शांति हेतु \"{planet_mantras[ruling_planet]}\" मंत्र का 108 बार जाप करें। (विस्तृत जानकारी के लिए आप हमारी वेबसाइट https://astrologerinranchi.com से व्यक्तिगत कुंडली ऑर्डर कर सकते हैं।)"
-        else:
-            mahadasha_statement = "महादशा अनुकूल है और जीवन में स्थिरता लाएगी।"
-            mahadasha_resolution = f"{ruling_planet} का आशीर्वाद बनाए रखने हेतु \"{planet_mantras[ruling_planet]}\" मंत्र का नियमित जाप करें। (विस्तृत जानकारी के लिए आप हमारी वेबसाइट https://astrologerinranchi.com से व्यक्तिगत कुंडली ऑर्डर कर सकते हैं।)"
-
-        if sade_sati:
-            sade_sati_statement = "साढ़ेसाती के प्रभाव से जीवन में कठिनाइयाँ आ सकती हैं क्योंकि शनि चंद्रमा के निकट है।"
-            sade_sati_resolution = "शनि देव की कृपा हेतु शनिवार को \"ॐ शं शनैश्चराय नमः\" मंत्र का 108 बार जाप करें। (विस्तृत जानकारी के लिए आप हमारी वेबसाइट https://astrologerinranchi.com से व्यक्तिगत कुंडली ऑर्डर कर सकते हैं।)"
-        else:
-            sade_sati_statement = "साढ़ेसाती का प्रभाव न्यूनतम है।"
-            sade_sati_resolution = "शनि देव का आशीर्वाद बनाए रखने हेतु \"ॐ शं शनैश्चराय नमः\" मंत्र का नियमित जाप करें। (विस्तृत जानकारी के लिए आप हमारी वेबसाइट https://astrologerinranchi.com से व्यक्तिगत कुंडली ऑर्डर कर सकते हैं।)"
-
-        mahadasha_sadesati_response = {
-            "mahadasha_problem": {
-                "statement": mahadasha_statement,
-                "resolution": mahadasha_resolution
-            },
-            "sade_sati_problem": {
-                "statement": sade_sati_statement,
-                "resolution": sade_sati_resolution
-            }
-        }
-
-        response = jsonify({
+        response = {
             "name": name,
             "birth_date": birth_date,
             "birth_time": birth_time,
             "birth_place": birth_place,
-            "mulyank": mulyank,
-            "latitude": lat,
-            "longitude": lon,
-            "birth_julian_day": birth_jd,
-            "ayanamsa_lahiri": ayanamsa - 0.88,
-            "sunrise_julian_day": sunrise_jd,
-            "sunrise_time": converted_sunrise_time,
-            "ist_kaal": ist_kaal,
-            "lagna_degree": lagna_degree,
             "lagna_rashi": lagna_rashi,
-            "janam_nakshatra": janam_nakshatra,
-            "janam_charan": janam_charan,
-            "rashi": rashi,
-            "rashi_naam_start_from": planet_positions["चंद्र"]["naming_letter"],
-            "gana": janam_gana,
             "lagna_chart": lagna_chart,
             "chandra_chart": chandra_chart,
-            "planet_positions": planet_positions,
-            "shubh_din": lucky_day,
+            "lagna_image_url": lagna_image_url,
+            "chandra_image_url": chandra_image_url,
+            "janam_nakshatra": janam_nakshatra,
+            "janam_charan": janam_charan,
+            "janam_gana": janam_gana,
+            "rashi": rashi,
+            "ist_kaal": ist_kaal,
+            "mahadasha_balance": mahadasha_balance,
+            "lucky_day": lucky_day,
             "ishta_devta": ishta_devta,
+            "mulyank": mulyank,
             "lucky_number": lucky_number,
-            "lucky_date": lucky_dates_str,
+            "lucky_dates": lucky_dates_str,
             "lucky_color": lucky_color,
-            "bhagyavardhak_ratna": bhagyavardhak,
             "jeevan_rakshak_ratna": jeevan_rakshak,
             "vidya_vardhak_ratna": vidya_vardhak,
+            "bhagyavardhak_ratna": bhagyavardhak,
             "mangal_dosha": mangal_dosha_details,
             "kaalsarp_dosha": kaalsarp_details,
-            "mahadasha": {"starting_planet": ruling_planet, "balance": mahadasha_balance},
-            "predictions": {
-                "study": study_response,
-                "money": money_response,
-                "work": work_response,
-                "marriage": marriage_response,
-                "mahadasha_sadesati": mahadasha_sadesati_response
-            },
-            "lagna_image": lagna_image_url,
-            "chandra_image": chandra_image_url
-        })
-        response.headers.add('Access-Control-Allow-Origin', 'https://astrologerinranchi.com')
-        logger.debug("Response prepared successfully")
-        return response
-        
-        if __name__ == '__main__':
-            app.run(host='0.0.0.0', port=5000)
+            "study": study_response,
+            "money": money_response,
+            "work": work_response,
+            "marriage": marriage_response,
+            "mahadasha_problem": mahadasha_problem,
+            "sade_sati": sade_sati
+        }
+
+        return jsonify(response), 200
+
+    except Exception as e:
+        logger.exception(f"Error in calculate_kundali: {str(e)}")
+        return jsonify({"error": f"Internal server error: {str(e)}"}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
